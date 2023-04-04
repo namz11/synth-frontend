@@ -1,3 +1,5 @@
+const colors = require("tailwindcss/colors");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -10,11 +12,14 @@ module.exports = {
   ],
   theme: {
     colors: {
-      // Configure your color palette here
-      "cc-pink": "#F472B6",
-      "cc-purple": "#A855F7",
-      "cc-blue": "#3B82F6",
-      "cc-indigo": "#4338CA",
+      // synth color palette
+      pink: colors.pink,
+      purple: colors.purple,
+      blue: colors.blue,
+      indigo: colors.indigo,
+      gray: colors.gray,
+      white: colors.white,
+      slate: colors.slate,
     },
     extend: {},
   },
