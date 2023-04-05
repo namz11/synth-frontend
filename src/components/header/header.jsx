@@ -9,11 +9,11 @@ const Header = () => {
   return (
     <>
       {/* taken from - https://merakiui.com/components/navbars */}
-      <nav className="relative bg-white shadow dark:bg-slate-800">
+      <nav className="relative bg-white shadow dark:bg-gray-800">
         <div className="container px-6 py-3 mx-auto md:flex">
           <div className="flex items-center justify-between">
             <Link href="/">
-              <span className="text-2xl font-bold text-slate-800 transition-colors duration-300 transform dark:text-white lg:text-3xl hover:text-slate-700 dark:hover:text-slate-300">
+              <span className="text-2xl font-bold text-gray-800 transition-colors duration-300 transform dark:text-white lg:text-3xl hover:text-gray-700 dark:hover:text-gray-300">
                 Synth
               </span>
             </Link>
@@ -23,7 +23,7 @@ const Header = () => {
               <button
                 onClick={() => setOpen(!isOpen)}
                 type="button"
-                className="text-slate-500 dark:text-slate-200 hover:text-slate-600 dark:hover:text-slate-400 focus:outline-none focus:text-slate-600 dark:focus:text-slate-400"
+                className="text-gray-500 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-400 focus:outline-none focus:text-gray-600 dark:focus:text-gray-400"
                 aria-label="toggle menu"
               >
                 {!isOpen && (
@@ -75,7 +75,7 @@ const Header = () => {
               <Link href="/home">
                 <span
                   href="#"
-                  className="px-2.5 py-2 text-slate-700 transition-colors duration-300 transform rounded-lg dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 md:mx-2"
+                  className="px-2.5 py-2 text-gray-700 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-700 md:mx-2"
                 >
                   Home
                 </span>
@@ -83,7 +83,7 @@ const Header = () => {
               <Link href="/user/playlists">
                 <span
                   href="#"
-                  className="px-2.5 py-2 text-slate-700 transition-colors duration-300 transform rounded-lg dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 md:mx-2"
+                  className="px-2.5 py-2 text-gray-700 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-700 md:mx-2"
                 >
                   My Playlists
                 </span>
@@ -93,7 +93,7 @@ const Header = () => {
             <div className="relative mt-4 md:mt-0">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                 <svg
-                  className="w-5 h-5 text-slate-400"
+                  className="w-5 h-5 text-gray-400"
                   viewBox="0 0 24 24"
                   fill="none"
                 >
@@ -109,14 +109,14 @@ const Header = () => {
 
               <input
                 type="text"
-                className="w-full py-2 pl-10 pr-4 text-slate-700 bg-white border rounded-lg dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-opacity-40 focus:ring-blue-300"
+                className="w-full py-2 pl-10 pr-4 text-gray-700 bg-white border rounded-lg dark:bg-slate-800 dark:text-gray-300 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-opacity-40 focus:ring-blue-300"
                 placeholder="Search"
               />
             </div>
 
             <div className="flex items-center mt-4 lg:mt-0">
               <button
-                className="hidden mx-4 text-slate-600 transition-colors duration-300 transform lg:block dark:text-slate-200 hover:text-slate-700 dark:hover:text-slate-400 focus:text-slate-700 dark:focus:text-slate-400 focus:outline-none"
+                className="hidden mx-4 text-gray-600 transition-colors duration-300 transform lg:block dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400 focus:text-gray-700 dark:focus:text-gray-400 focus:outline-none"
                 aria-label="show notifications"
               >
                 <FiLogOut />
@@ -135,7 +135,7 @@ const Header = () => {
                   />
                 </div>
 
-                <h3 className="mx-2 text-slate-700 dark:text-slate-200 lg:hidden">
+                <h3 className="mx-2 text-gray-700 dark:text-gray-200 lg:hidden">
                   Khatab wedaa
                 </h3>
               </button>
