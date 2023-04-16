@@ -49,7 +49,6 @@ function SignUp() {
         await updateProfile(user, { displayName });
 
         await setDoc(doc(db, "users", user.uid), {
-          uid: user.uid,
           firstName,
           lastName,
           displayName,

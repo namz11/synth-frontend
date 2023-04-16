@@ -9,6 +9,15 @@ import { AuthContext } from "../../context/AuthContext";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import Image from "next/image";
 import { useAuthState } from "react-firebase-hooks/auth";
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+} from "firebase/firestore";
+
+const db = getFirestore();
 
 function LogIn() {
   const router = useRouter();
@@ -26,11 +35,35 @@ function LogIn() {
 
   const handleGoogleSignIn = () => {
     signInWithPopup(auth, new GoogleAuthProvider())
-      .then((result) => {
+      .then(async (result) => {
         // The signed-in user info.
         const user = result.user;
         // Do something with the user object...
         dispatch({ type: "LOGIN", payload: user });
+
+        const { displayName, email, uid } = user;
+        const nameParts = displayName.split(" ");
+        const firstName = nameParts[0];
+        const lastName =
+          nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+        const userDocRef = doc(db, "users", uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+          const response = await setDoc(userDocRef, {
+            firstName,
+            lastName,
+            displayName,
+            email,
+          })
+            .then(() => {
+              console.log("Document written successfully!");
+            })
+            .catch((error) => {
+              console.error("Error writing document: ", error);
+            });
+        }
       })
       .catch((error) => {
         console.log(error);
