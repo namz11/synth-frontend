@@ -1,26 +1,67 @@
 import Scroller from "@components/scroller/scroller";
 import MainLayout from "@components/layouts/main-layout";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import withAuth from "../../components/withauth";
 import axios from "axios";
+
+// #FIREBASEAUTH For authentication and authorisation
+import { AuthContext } from "../../context/AuthContext";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth, signIn } from "../../firebase";
 
 const Home = () => {
   const [featuredPlaylist, setFeaturedPlaylist] = useState(null);
   const [categoryPlaylists, setCategoryPlaylists] = useState(null);
 
+  // #FIREBASEAUTH For checking if the user is logged in, the session is active and if the seesion is loading
+  const [user, loading] = useAuthState(auth);
+  const { currentUser } = useContext(AuthContext);
+
+  // #FIREBASEAUTH async function for getting the value of token before making api call and passing the token as the header
+  const logToken = async () => {
+    if (user) {
+      const token = await user.getIdToken();
+      return token;
+    }
+  };
+
   useEffect(() => {
-    async function fetchFeaturedPlaylists() {
-      const { data } = await axios("/api/playlists/featured");
+    // passed the header in this way so the middleware can check if the user is authorised or not
+    async function fetchFeaturedPlaylists(theToken) {
+      const { data } = await axios("/api/playlists/featured", {
+        headers: {
+          Authorization: `Bearer ${theToken}`,
+        },
+      });
       console.log("featured", data);
       setFeaturedPlaylist(data);
     }
-    async function fetchCategoryPlaylists() {
-      const { data } = await axios("/api/playlists/category");
+    async function fetchCategoryPlaylists(theToken) {
+      const { data } = await axios("/api/playlists/category", {
+        headers: {
+          Authorization: `Bearer ${theToken}`,
+        },
+      });
       console.log("category", data);
       setCategoryPlaylists(data);
     }
-    fetchFeaturedPlaylists();
-    fetchCategoryPlaylists();
-  }, []);
+
+    // #FIREBASEAUTH If loading is false and user is authenticated,  an array of promises that includes two functions is created.
+    if (!loading) {
+      if (user) {
+        const promises = [logToken()];
+        // #FIREBASEAUTH Promise.all is used to execute both promises concurrently and wait until they are both resolved.
+        Promise.all(promises).then(([theToken]) => {
+          // #FIREBASEAUTH Once the promises are resolved, the fetchFeaturedPlaylists function and the fetchCategoryPlaylists function is called with resolved token as a parameter.
+          fetchFeaturedPlaylists(theToken);
+          fetchCategoryPlaylists(theToken);
+        });
+      } else {
+        // FIREBASEAUTH If user is falsy, the code logs a message "Denied due to unauthorized".
+        console.log("Denied due to unauthorized");
+      }
+    }
+  }, [user, loading]);
 
   return (
     <>
@@ -49,4 +90,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default withAuth(Home);

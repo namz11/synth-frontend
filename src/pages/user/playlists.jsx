@@ -1,17 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Tile from "@components/tile/tile";
 import MainLayout from "@components/layouts/main-layout";
 import axios from "axios";
 import { FiPlus } from "react-icons/fi";
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-
+import withAuth from "../../components/withauth";
 import { CgSpinner } from "react-icons/cg";
+
+// #FIREBASEAUTH For authentication and authorisation
+import { AuthContext } from "../../context/AuthContext";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth, signIn } from "../../firebase";
 
 const MyPlaylists = () => {
   const [userPlaylists, setUserPlaylists] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // #FIREBASEAUTH For checking if the user is logged in, the session is active and if the seesion is loading
+  const [user, loading] = useAuthState(auth);
+  const { currentUser } = useContext(AuthContext);
+
+  // #FIREBASEAUTH async function for getting the value of token before making api call and passing the token as the header
+  const logToken = async () => {
+    if (user) {
+      const token = await user.getIdToken();
+      return token;
+    }
+  };
 
   const createPlaylist = async () => {
     try {
@@ -20,10 +37,26 @@ const MyPlaylists = () => {
       const { data } = await axios.post("/api/user/playlists", {
         name,
         userId: "narmit",
+        headers: {
+          Authorization: `Bearer ${theToken}`,
+        },
       });
       if (data?.success) {
         setIsOpen(false);
-        fetchUserPlaylists();
+        if (!loading) {
+          if (user) {
+            const promises = [logToken()];
+            // #FIREBASEAUTH Promise.all is used to execute both promises concurrently and wait until they are both resolved.
+            Promise.all(promises).then(([theToken]) => {
+              // #FIREBASEAUTH Once the promises are resolved, the fetchUserPlaylists function is called with resolved token as a parameter.
+              fetchUserPlaylists(theToken);
+            });
+          }
+          fetchUserPlaylists();
+        } else {
+          // FIREBASEAUTH If user is falsy, the code logs a message "Denied due to unauthorized".
+          console.log("Denied due to unauthorized");
+        }
       } else {
         // TODO show error
       }
@@ -34,15 +67,25 @@ const MyPlaylists = () => {
     }
   };
 
-  async function fetchUserPlaylists() {
-    const { data } = await axios("/api/user/playlists");
+  async function fetchUserPlaylists(theToken) {
+    const { data } = await axios("/api/user/playlists", {
+      headers: {
+        Authorization: `Bearer ${theToken}`,
+      },
+    });
     console.log("user playlists", data);
     setUserPlaylists(data?.items);
   }
 
   useEffect(() => {
-    fetchUserPlaylists();
-  }, []);
+    if (!loading && user) {
+      logToken().then((theToken) => {
+        fetchUserPlaylists(theToken);
+      });
+    } else if (!loading) {
+      console.log("Denied due to unauthorized");
+    }
+  }, [user, loading]);
 
   return (
     <>
@@ -145,4 +188,4 @@ const MyPlaylists = () => {
   );
 };
 
-export default MyPlaylists;
+export default withAuth(MyPlaylists);

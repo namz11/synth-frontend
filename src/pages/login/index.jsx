@@ -41,7 +41,7 @@ function LogIn() {
         // Do something with the user object...
         dispatch({ type: "LOGIN", payload: user });
 
-        const { displayName, email, uid } = user;
+        const { displayName, email, uid, photoURL } = user;
         const nameParts = displayName.split(" ");
         const firstName = nameParts[0];
         const lastName =
@@ -56,6 +56,7 @@ function LogIn() {
             lastName,
             displayName,
             email,
+            photoURL,
           })
             .then(() => {
               console.log("Document written successfully!");

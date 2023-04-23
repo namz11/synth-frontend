@@ -5,27 +5,19 @@ import { useRouter } from "next/router";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
 import { getAuth, signOut } from "firebase/auth";
-import { signIn } from "../../firebase";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+const db = getFirestore();
 
 import { FiLogOut } from "react-icons/fi";
 
 const Header = () => {
   const [isOpen, setOpen] = useState(false);
-  // #FIREBASEAUTH An example of using AuthContext to find if the user is logged in or not
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, loading] = useAuthState(auth);
+  const { currentUser } = useContext(AuthContext);
+  const [photoURL, setPhotoURL] = useState("");
 
   const router = useRouter();
   const { dispatch } = useContext(AuthContext);
-
-  const logToken = async () => {
-    // #FIREBASEAUTH using useAuthState
-    if (user) {
-      const token = await user.getIdToken();
-      return token;
-    }
-  };
 
   const handleLogout = () => {
     const auth = getAuth();
@@ -46,19 +38,26 @@ const Header = () => {
   };
 
   useEffect(() => {
+    const fetchUserData = async (uid) => {
+      const userDoc = await getDoc(doc(db, "users", uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.photoURL) {
+          setPhotoURL(userData.photoURL);
+        }
+      }
+    };
+
     // #FIREBASEAUTH using useAuthState
     if (!loading) {
       if (user) {
-        console.log("User Found!");
-        const promises = [logToken()];
-        // #FIREBASEAUTH The Promise.all method is then used to execute both promises concurrently and wait until they are both resolved. Once the promises have resolved, the fetchData function is called with the resolved token as a parameter.
-        Promise.all(promises).then(([theToken]) => {
-          // console.log(theToken);
-          console.log(`User ${user ? true : false}`);
-        });
+        if (user.photoURL) {
+          setPhotoURL(user.photoURL);
+        } else {
+          fetchUserData(user.uid);
+        }
       } else {
         console.log("Denied due to unauthorized");
-        console.log(`User ${user ? true : false}`);
       }
     }
   }, [user, loading]);
@@ -141,13 +140,6 @@ const Header = () => {
                 My Playlists
               </span>
             </Link>
-            <button
-              type="button"
-              className="px-2.5 py-2 text-gray-700 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-700 md:mx-2"
-              onClick={async () => console.log(await logToken())}
-            >
-              Check Status
-            </button>
           </div>
 
           <div className="relative mt-4 md:mt-0">
@@ -178,9 +170,6 @@ const Header = () => {
             <button
               className="hidden mx-4 text-gray-600 transition-colors duration-300 transform lg:block dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400 focus:text-gray-700 dark:focus:text-gray-400 focus:outline-none"
               aria-label="show notifications"
-              // onClick={() => {
-              //   console.log("Logout Button!");
-              // }}
               onClick={handleLogout}
             >
               <FiLogOut />
@@ -190,18 +179,21 @@ const Header = () => {
               type="button"
               className="flex items-center focus:outline-none"
               aria-label="toggle profile dropdown"
+              onClick={() => {
+                if (user) {
+                  router.push("/profile");
+                } else {
+                  router.push("/login");
+                }
+              }}
             >
-              <div className="w-8 h-8 overflow-hidden border-2 border-slate-400 rounded-full">
+              <div className="w-8 h-8 overflow-hidden border-2 border-slate-100 rounded-full ">
                 <img
-                  src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80"
+                  src={photoURL || "/user.png"}
                   className="object-cover w-full h-full"
                   alt="avatar"
                 />
               </div>
-
-              <h3 className="mx-2 text-gray-700 dark:text-gray-200 lg:hidden">
-                Khatab wedaa
-              </h3>
             </button>
           </div>
         </div>
@@ -287,13 +279,6 @@ const Header = () => {
                 My Playlists
               </span>
             </Link>
-            <button
-              type="button"
-              className="px-2.5 py-2 text-gray-700 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-700 md:mx-2"
-              onClick={async () => console.log(await logToken())}
-            >
-              Check Status
-            </button>
           </div>
 
           <div className="relative mt-4 md:mt-0">
@@ -324,9 +309,6 @@ const Header = () => {
             <button
               className="hidden mx-4 text-gray-600 transition-colors duration-300 transform lg:block dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400 focus:text-gray-700 dark:focus:text-gray-400 focus:outline-none"
               aria-label="show notifications"
-              // onClick={() => {
-              //   console.log("Logout Button!");
-              // }}
               onClick={logInRedirect}
             >
               Log In
@@ -336,18 +318,21 @@ const Header = () => {
               type="button"
               className="flex items-center focus:outline-none"
               aria-label="toggle profile dropdown"
+              onClick={() => {
+                if (user) {
+                  router.push("/profile");
+                } else {
+                  router.push("/login");
+                }
+              }}
             >
-              <div className="w-8 h-8 overflow-hidden border-2 border-slate-400 rounded-full">
+              <div className="w-8 h-8 overflow-hidden border-2 border-slate-100 rounded-full ">
                 <img
-                  src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80"
+                  src={photoURL || "/user.png"}
                   className="object-cover w-full h-full"
                   alt="avatar"
                 />
               </div>
-
-              <h3 className="mx-2 text-gray-700 dark:text-gray-200 lg:hidden">
-                Khatab wedaa
-              </h3>
             </button>
           </div>
         </div>

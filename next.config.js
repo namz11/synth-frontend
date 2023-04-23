@@ -12,3 +12,20 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
+// const nextConfig = {
+//   reactStrictMode: true,
+//   async rewrites() {
+//     const protocol = process.env.SYNTH_BASE_API.startsWith("https")
+//       ? "https://"
+//       : "http://";
+//     return [
+//       {
+//         source: "/api/:path*",
+//         destination: `${protocol}${process.env.SYNTH_BASE_API}/api/:path*`,
+//       },
+//     ];
+//   },
+// };
+
+// module.exports = nextConfig;
