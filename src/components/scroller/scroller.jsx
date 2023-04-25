@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import Tile from "@components/tile/tile";
+import PlaylistTile from "@components/tiles/playlistTile";
+import TrackTile from "@components/tiles/trackTile";
 
-const Scroller = ({ title, tagline, playlists }) => {
+const Scroller = ({ title, tagline, items, isTracks }) => {
   return (
     <>
       <div className="mx-auto px-4 sm:px-8 lg:px-12 my-4">
@@ -11,11 +12,15 @@ const Scroller = ({ title, tagline, playlists }) => {
         <div className="text-3xl font-bold text-gray-200">{title}</div>
 
         <div className="overflow-x-scroll mt-3 flex flex-row justify-start items-center space-x-5 flex-nowrap">
-          {playlists &&
-            playlists.length > 0 &&
-            playlists.map((playlist) => (
-              <Tile key={playlist?.id} data={playlist} />
-            ))}
+          {items &&
+            items.length > 0 &&
+            items.map((item) => {
+              if (isTracks) {
+                return <TrackTile key={item?.id} data={item} />;
+              } else {
+                return <PlaylistTile key={item?.id} data={item} />;
+              }
+            })}
         </div>
       </div>
     </>

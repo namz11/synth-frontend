@@ -107,7 +107,11 @@ const Header = () => {
                 </svg>
               </span>
 
+              <label for="search" hidden>
+                Search term
+              </label>
               <input
+                id="search"
                 type="text"
                 className="w-full py-2 pl-10 pr-4 text-gray-700 bg-white border rounded-lg dark:bg-slate-800 dark:text-gray-300 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-opacity-40 focus:ring-blue-300"
                 placeholder="Search"
@@ -135,9 +139,9 @@ const Header = () => {
                   />
                 </div>
 
-                <h3 className="mx-2 text-gray-700 dark:text-gray-200 lg:hidden">
+                <p className="mx-2 text-gray-700 dark:text-gray-200 lg:hidden text-lg">
                   Khatab wedaa
-                </h3>
+                </p>
               </button>
             </div>
           </div>
