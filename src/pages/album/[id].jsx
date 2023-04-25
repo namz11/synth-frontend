@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import PlaylistFromAPI from "@components/playlist/playlistFromAPI";
 import MainLayout from "@components/layouts/main-layout";
 import axios from "axios";
+import AlbumComponent from "@components/album/album";
 
-const Playlist = () => {
+const Album = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const [playlistData, setPlaylistData] = useState(null);
+  const [albumData, setAlbumData] = useState(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function fetchAlbumData() {
       if (id) {
-        const { data } = await axios(`/api/playlists/${id}`);
-        setPlaylistData(data);
+        const { data } = await axios(`/api/album/${id}`);
+        setAlbumData(data);
         setLoading(false);
       }
     }
@@ -31,11 +31,11 @@ const Playlist = () => {
     return (
       <>
         <MainLayout>
-          <PlaylistFromAPI playlistData={playlistData} />
+          <AlbumComponent albumData={albumData} />
         </MainLayout>
       </>
     );
   }
 };
 
-export default Playlist;
+export default Album;
