@@ -198,7 +198,6 @@ const Profile = () => {
                   className="w-full text-white bg-blue-700 rounded py-2 px-4"
                 />
               </div>
-              //////////////////////////////////////////////////////////////////////////
               {!isGoogleProvider && (
                 <>
                   <div className="mb-4">
@@ -237,11 +236,9 @@ const Profile = () => {
                   </div>
                 </>
               )}
-              //////////////////////////////////////////////////////////////////////////
               {errorMessage && (
                 <div className="text-red-500 mt-2">{errorMessage}</div>
               )}
-              //////////////////////////////////////////////////////////////////////////
               <button
                 onClick={handleSaveClick}
                 className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded transition hover:bg-blue-500 focus:outline-none focus:ring"
