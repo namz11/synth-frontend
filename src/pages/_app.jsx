@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import "@styles/globals.css";
-import { AuthContextProvider } from "../context/AuthContext";
+import { AuthContextProvider } from "@context/AuthContext";
 
 const App = ({ Component, pageProps }) => {
   return (

@@ -1,14 +1,16 @@
 import MainLayout from "@components/layouts/main-layout";
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, updateEmail, updatePassword } from "../../firebase";
+// TODO aman - fix this import - there is no updateEmail oor updatePassword
+// import { auth, updateEmail, updatePassword } from "@utils/firebase";
+import { auth } from "@utils/firebase";
 import { useRouter } from "next/router";
 import { getFirestore, doc, updateDoc, getDoc } from "firebase/firestore";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import withAuth from "@components/withAuth";
 const db = getFirestore();
-import withAuth from "../../components/withauth";
 
-const profile = () => {
+const Profile = () => {
   const [user, loading] = useAuthState(auth);
   const [userId, setUserId] = useState(null);
   const [editing, setEditing] = useState(false);
@@ -42,7 +44,7 @@ const profile = () => {
     };
 
     fetchUserData();
-  }, [user]);
+  }, [router, user]);
 
   const handleEditGoogle = async () => {
     const provider = new GoogleAuthProvider();
@@ -89,9 +91,10 @@ const profile = () => {
         lastName,
       });
 
-      if (password) {
-        await updatePassword(user, password);
-      }
+      // TODO aman - fix this
+      // if (password) {
+      //   await updatePassword(user, password);
+      // }
 
       setEditing(false);
     } catch (error) {
@@ -166,4 +169,4 @@ const profile = () => {
   );
 };
 
-export default withAuth(profile);
+export default withAuth(Profile);

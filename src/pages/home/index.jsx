@@ -1,13 +1,13 @@
 import Scroller from "@components/scroller/scroller";
 import MainLayout from "@components/layouts/main-layout";
 import React, { useEffect, useState, useContext } from "react";
-import withAuth from "../../components/withauth";
+import withAuth from "@components/withAuth";
 import axios from "axios";
 
 // #FIREBASEAUTH For authentication and authorisation
-import { AuthContext } from "../../context/AuthContext";
+import { AuthContext } from "@context/AuthContext";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, signIn } from "../../firebase";
+import { auth, signIn } from "@utils/firebase";
 
 const Home = () => {
   const [featuredPlaylist, setFeaturedPlaylist] = useState(null);
@@ -17,15 +17,15 @@ const Home = () => {
   const [user, loading] = useAuthState(auth);
   const { currentUser } = useContext(AuthContext);
 
-  // #FIREBASEAUTH async function for getting the value of token before making api call and passing the token as the header
-  const logToken = async () => {
-    if (user) {
-      const token = await user.getIdToken();
-      return token;
-    }
-  };
-
   useEffect(() => {
+    // #FIREBASEAUTH async function for getting the value of token before making api call and passing the token as the header
+    const logToken = async () => {
+      if (user) {
+        const token = await user.getIdToken();
+        return token;
+      }
+    };
+
     // passed the header in this way so the middleware can check if the user is authorised or not
     async function fetchFeaturedPlaylists(theToken) {
       const { data } = await axios("/api/playlists/featured", {

@@ -2,8 +2,8 @@ import MainLayout from "@components/layouts/main-layout";
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { auth, signUp } from "../../firebase";
-import { AuthContext } from "../../context/AuthContext";
+import { auth, signUp } from "@utils/firebase";
+import { AuthContext } from "@context/AuthContext";
 import Image from "next/image";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
@@ -57,7 +57,7 @@ function SignUp() {
         router.push("/");
       }
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");

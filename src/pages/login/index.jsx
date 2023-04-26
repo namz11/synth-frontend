@@ -3,8 +3,8 @@ import React, { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 // #FIREBASEAUTH Import auth, signIn (normal) from the firebase.config file
-import { auth, signIn } from "../../firebase";
-import { AuthContext } from "../../context/AuthContext";
+import { auth, signIn } from "@utils/firebase";
+import { AuthContext } from "@context/AuthContext";
 // #FIREBASEAUTH getAuth, signInWithPopup, GoogleAuthProvider from firebase/auth
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import Image from "next/image";
@@ -31,7 +31,7 @@ function LogIn() {
         router.push("/");
       }
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   const handleGoogleSignIn = () => {
     signInWithPopup(auth, new GoogleAuthProvider())

@@ -5,13 +5,13 @@ import axios from "axios";
 import { FiPlus } from "react-icons/fi";
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import withAuth from "../../components/withauth";
+import withAuth from "@components/withAuth";
 import { CgSpinner } from "react-icons/cg";
 
 // #FIREBASEAUTH For authentication and authorisation
-import { AuthContext } from "../../context/AuthContext";
+import { AuthContext } from "@context/AuthContext";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, signIn } from "../../firebase";
+import { auth, signIn } from "@utils/firebase";
 
 const MyPlaylists = () => {
   const [userPlaylists, setUserPlaylists] = useState(null);
@@ -21,14 +21,6 @@ const MyPlaylists = () => {
   // #FIREBASEAUTH For checking if the user is logged in, the session is active and if the seesion is loading
   const [user, loading] = useAuthState(auth);
   const { currentUser } = useContext(AuthContext);
-
-  // #FIREBASEAUTH async function for getting the value of token before making api call and passing the token as the header
-  const logToken = async () => {
-    if (user) {
-      const token = await user.getIdToken();
-      return token;
-    }
-  };
 
   const createPlaylist = async () => {
     try {
@@ -78,6 +70,14 @@ const MyPlaylists = () => {
   }
 
   useEffect(() => {
+    // #FIREBASEAUTH async function for getting the value of token before making api call and passing the token as the header
+    const logToken = async () => {
+      if (user) {
+        const token = await user.getIdToken();
+        return token;
+      }
+    };
+
     if (!loading && user) {
       logToken().then((theToken) => {
         fetchUserPlaylists(theToken);
