@@ -1,6 +1,5 @@
 import React, { createContext, useEffect, useReducer, useRef } from "react";
 import AuthReducer from "./AuthReducer";
-import { debounce } from "lodash";
 
 const INITIAL_STATE = {
   currentUser: null,
