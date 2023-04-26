@@ -107,7 +107,7 @@ const Header = () => {
                 </svg>
               </span>
 
-              <label for="search" hidden>
+              <label htmlFor="search" hidden>
                 Search term
               </label>
               <input
