@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { toString } from "lodash-es";
-const Tile = ({ data }) => {
+
+const PlaylistTile = ({ data }) => {
   const isUserPlaylist = toString(data?.userId).trim() !== "";
 
   if (data) {
@@ -89,4 +90,4 @@ const Tile = ({ data }) => {
   }
 };
 
-export default Tile;
+export default PlaylistTile;

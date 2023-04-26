@@ -10,6 +10,8 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, signIn } from "@utils/firebase";
 
 const Home = () => {
+  const [recentTracks, setRecentTracks] = useState(null);
+  const [mostPlayed, setMostPlayed] = useState(null);
   const [featuredPlaylist, setFeaturedPlaylist] = useState(null);
   const [categoryPlaylists, setCategoryPlaylists] = useState(null);
 
@@ -27,6 +29,24 @@ const Home = () => {
     };
 
     // passed the header in this way so the middleware can check if the user is authorised or not
+    async function fetchRecentTracks(theToken) {
+      const { data } = await axios("/api/tracks/user/recent", {
+        headers: {
+          Authorization: `Bearer ${theToken}`,
+        },
+      });
+      console.log("recent", data);
+      setRecentTracks(data?.items);
+    }
+    async function fetchMostPlayed(theToken) {
+      const { data } = await axios("/api/tracks/user/most-played", {
+        headers: {
+          Authorization: `Bearer ${theToken}`,
+        },
+      });
+      console.log("most-played", data);
+      setMostPlayed(data?.items);
+    }
     async function fetchFeaturedPlaylists(theToken) {
       const { data } = await axios("/api/playlists/featured", {
         headers: {
@@ -53,6 +73,8 @@ const Home = () => {
         // #FIREBASEAUTH Promise.all is used to execute both promises concurrently and wait until they are both resolved.
         Promise.all(promises).then(([theToken]) => {
           // #FIREBASEAUTH Once the promises are resolved, the fetchFeaturedPlaylists function and the fetchCategoryPlaylists function is called with resolved token as a parameter.
+          fetchRecentTracks(theToken);
+          fetchMostPlayed(theToken);
           fetchFeaturedPlaylists(theToken);
           fetchCategoryPlaylists(theToken);
         });
@@ -66,13 +88,28 @@ const Home = () => {
   return (
     <>
       <MainLayout>
+        {mostPlayed && mostPlayed?.length > 0 && (
+          <Scroller
+            title={"Listen Again"}
+            items={mostPlayed || []}
+            isTracks={true}
+          />
+        )}
+        {recentTracks && recentTracks?.length > 0 && (
+          <Scroller
+            title={"Recently Played"}
+            items={recentTracks || []}
+            isTracks={true}
+          />
+        )}
         {featuredPlaylist && (
           <Scroller
             title={"Featured Playlists"}
             tagline={
               featuredPlaylist?.message || "music that's hot and happening"
             }
-            playlists={featuredPlaylist?.playlists?.items || []}
+            items={featuredPlaylist?.playlists?.items || []}
+            isTracks={false}
           />
         )}
         {categoryPlaylists &&
@@ -82,7 +119,8 @@ const Home = () => {
               key={item.title}
               title={item?.title}
               tagline={item?.message}
-              playlists={item?.playlists?.items || []}
+              items={item?.playlists?.items || []}
+              isTracks={false}
             />
           ))}
       </MainLayout>

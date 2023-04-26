@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import Tile from "@components/tile/tile";
+import PlaylistTile from "@components/tiles/playlistTile";
 import MainLayout from "@components/layouts/main-layout";
 import axios from "axios";
 import { FiPlus } from "react-icons/fi";
@@ -109,7 +109,7 @@ const MyPlaylists = () => {
             {userPlaylists &&
               userPlaylists?.length > 0 &&
               userPlaylists.map((playlist) => (
-                <Tile key={playlist?.id} data={playlist} />
+                <PlaylistTile key={playlist?.id} data={playlist} />
               ))}
           </div>
         </div>
