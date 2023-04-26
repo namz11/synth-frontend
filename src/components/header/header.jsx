@@ -62,6 +62,9 @@ const Header = () => {
     }
   }, [user, loading]);
 
+  {
+    /* taken from - https://merakiui.com/components/navbars */
+  }
   const loggedInNav = (
     <nav className="relative bg-white shadow dark:bg-gray-800">
       <div className="container px-6 py-3 mx-auto md:flex">
