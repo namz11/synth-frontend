@@ -87,29 +87,6 @@ function SignUp() {
         // email verification
         await sendEmailVerification(user);
 
-        // phone verification
-        const appVerifier = recaptchaVerifierRef.current;
-        const phoneProvider = new PhoneAuthProvider(auth);
-        const verificationId = await phoneProvider.verifyPhoneNumber(
-          phone,
-          appVerifier
-        );
-
-        const code = window.prompt(
-          "Enter the verification code sent to your phone:"
-        );
-        if (!code) {
-          setError("Verification code is required");
-          return;
-        }
-
-        const phoneCredential = await PhoneAuthProvider.credential(
-          verificationId,
-          code
-        );
-        await signInWithPhoneNumber(auth, phoneCredential);
-
-        ///////////////////////////////////////////////////////////////////////////////////////
         const displayName = `${firstName} ${lastName}`;
         await updateProfile(user, { displayName });
 
@@ -135,6 +112,7 @@ function SignUp() {
           displayName,
           email,
           photoURL,
+          emailVerified: false,
         });
 
         router.push("/");

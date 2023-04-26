@@ -6,7 +6,14 @@ import Link from "next/link";
 import { auth, signIn } from "@utils/firebase";
 import { AuthContext } from "@context/AuthContext";
 // #FIREBASEAUTH getAuth, signInWithPopup, GoogleAuthProvider from firebase/auth
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  sendEmailVerification,
+  signOut,
+} from "firebase/auth";
 import Image from "next/image";
 import { useAuthState } from "react-firebase-hooks/auth";
 import {
@@ -15,6 +22,7 @@ import {
   doc,
   setDoc,
   getDoc,
+  updateDoc,
 } from "firebase/firestore";
 
 const db = getFirestore();
@@ -25,22 +33,37 @@ function LogIn() {
   const [user, loading] = useAuthState(auth);
 
   useEffect(() => {
-    // #FIREBASEAUTH using useAuthState
-    if (!loading) {
-      if (user) {
-        router.push("/");
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && user.emailVerified) {
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, { emailVerified: true });
       }
-    }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const checkUserAndRedirect = async () => {
+      if (!loading) {
+        if (user && user.emailVerified) {
+          router.push("/");
+        } else {
+          await auth.signOut();
+        }
+      }
+    };
+
+    checkUserAndRedirect();
   }, [user, loading, router]);
 
   const handleGoogleSignIn = () => {
     signInWithPopup(auth, new GoogleAuthProvider())
       .then(async (result) => {
-        // The signed-in user info.
         const user = result.user;
-        // Do something with the user object...
         dispatch({ type: "LOGIN", payload: user });
-
         const { displayName, email, uid, photoURL } = user;
         const nameParts = displayName.split(" ");
         const firstName = nameParts[0];
@@ -83,19 +106,40 @@ function LogIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
+  const resendVerificationEmail = async () => {
+    try {
+      const userCredential = await signIn(auth, email, password);
+      const user = userCredential.user;
+
+      if (!user.emailVerified) {
+        await sendEmailVerification(user);
+        setError("Verification email resent. Please check your inbox.");
+      }
+    } catch (error) {
+      const errorMessage = error.message;
+      console.log(errorMessage);
+    }
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    signIn(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
+    try {
+      const userCredential = await signIn(auth, email, password);
+      const user = userCredential.user;
+      {
+        console.log(`EMAIL VERIFIED? ${user.emailVerified}`);
+      }
+      if (user.emailVerified === true) {
         dispatch({ type: "LOGIN", payload: user });
         router.push("/");
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        console.log(errorMessage);
-      });
+      } else {
+        setError("Please verify your email before logging in.");
+      }
+    } catch (error) {
+      const errorMessage = error.message;
+      console.log(errorMessage);
+    }
   };
 
   return (
@@ -193,6 +237,12 @@ function LogIn() {
                         </Link>
                       </p>
                     </div>
+                    <button
+                      onClick={resendVerificationEmail}
+                      className="inline-block rounded-md border border-blue-600 bg-blue-600 px-20 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-900"
+                    >
+                      Resend Verification Email
+                    </button>
                   </form>
                   <div className="mt-6 grid grid-cols-4 gap-2">
                     <div className="col-span-4 sm:col-span-2">

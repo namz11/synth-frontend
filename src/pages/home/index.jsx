@@ -1,6 +1,6 @@
 import Scroller from "@components/scroller/scroller";
 import MainLayout from "@components/layouts/main-layout";
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import withAuth from "@components/withAuth";
 import axios from "axios";
 
