@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import withAuth from "@components/withAuth";
 import PlaylistFromAPI from "@components/playlist/playlistFromAPI";
 import MainLayout from "@components/layouts/main-layout";
 import axios from "axios";
@@ -38,4 +39,4 @@ const Playlist = () => {
   }
 };
 
-export default Playlist;
+export default withAuth(Playlist);
