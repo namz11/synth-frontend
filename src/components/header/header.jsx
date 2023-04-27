@@ -25,7 +25,7 @@ const Header = () => {
       .then(() => {
         console.log("Successfully Logged Out!");
         dispatch({ type: "LOGOUT" });
-        router.push("/login");
+        router.push("/auth/login");
       })
       .catch((error) => {
         console.log(error);
@@ -34,7 +34,7 @@ const Header = () => {
 
   const logInRedirect = () => {
     console.log("PLEASE LOGIN");
-    router.push("/login");
+    router.push("/auth/login");
   };
 
   useEffect(() => {
@@ -186,7 +186,7 @@ const Header = () => {
                 if (user) {
                   router.push("/profile");
                 } else {
-                  router.push("/login");
+                  router.push("/auth/login");
                 }
               }}
             >
@@ -325,7 +325,7 @@ const Header = () => {
                 if (user) {
                   router.push("/profile");
                 } else {
-                  router.push("/login");
+                  router.push("/auth/login");
                 }
               }}
             >
