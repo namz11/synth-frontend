@@ -4,32 +4,64 @@ import MainLayout from "@components/layouts/main-layout";
 import axios from "axios";
 import ArtistComponent from "@components/artist/artist";
 
+// #FIREBASEAUTH For authentication and authorisation
+import { AuthContext } from "@context/AuthContext";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth, signIn } from "@utils/firebase";
+
 const Artist = () => {
   const router = useRouter();
   const { id } = router.query;
 
+  const [user, loading] = useAuthState(auth);
+
   const [artistData, setArtistData] = useState(null);
   const [artistTopTracksData, setArtistTopTracksData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loader, setLoading] = useState(true);
   useEffect(() => {
-    async function fetchArtistData() {
+    const logToken = async () => {
+      if (user) {
+        const token = await user.getIdToken();
+        return token;
+      }
+    };
+
+    async function fetchArtistData(theToken) {
       if (id) {
-        const { data } = await axios(`/api/artist/${id}`);
+        const { data } = await axios(`/api/artist/${id}`, {
+          headers: {
+            Authorization: `Bearer ${theToken}`,
+          },
+        });
         setArtistData(data);
       }
     }
-    async function fetchArtistTopTracksData() {
+    async function fetchArtistTopTracksData(theToken) {
       if (id) {
-        const { data } = await axios(`/api/artist/${id}/top-tracks`);
+        const { data } = await axios(`/api/artist/${id}/top-tracks`, {
+          headers: {
+            Authorization: `Bearer ${theToken}`,
+          },
+        });
         setArtistTopTracksData(data);
         setLoading(false);
       }
     }
-    fetchArtistData();
-    fetchArtistTopTracksData();
-  }, [id]);
 
-  if (loading) {
+    if (!loading) {
+      if (user) {
+        const promises = [logToken()];
+        Promise.all(promises).then(([theToken]) => {
+          fetchArtistData(theToken);
+          fetchArtistTopTracksData(theToken);
+        });
+      } else {
+        console.log("Denied due to unauthorized");
+      }
+    }
+  }, [id, user, loading]);
+
+  if (loader) {
     return (
       <>
         <div>Loading</div>
