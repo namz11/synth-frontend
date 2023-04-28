@@ -1,5 +1,5 @@
 import MainLayout from "@components/layouts/main-layout";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 // TODO aman - fix this import - there is no updateEmail oor updatePassword
 import {
@@ -11,15 +11,8 @@ import {
 import { auth } from "@utils/firebase";
 import { useRouter } from "next/router";
 import { getFirestore, doc, updateDoc, getDoc } from "firebase/firestore";
-import {
-  getAuth,
-  signInWithPopup,
-  GoogleAuthProvider,
-  updateProfile,
-  updateEmail,
-  updatePassword,
-} from "firebase/auth";
-
+import { updateProfile, updatePassword, signOut, getAuth } from "firebase/auth";
+import { AuthContext } from "@context/AuthContext";
 import withAuth from "@components/withAuth";
 const db = getFirestore();
 
@@ -33,7 +26,7 @@ const Profile = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
-  const [photo, setPhoto] = useState(null);
+  const [photo, setPhoto] = useState(user.photoURL);
   const [photoChanged, setPhotoChanged] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isGoogleProvider, setIsGoogleProvider] = useState(false);
@@ -67,13 +60,17 @@ const Profile = () => {
     }
   };
 
+  // For changing the value of display name when the valuye of the first name or last name changes.
+  useEffect(() => {
+    setDisplayName(`${firstName} ${lastName}`);
+  }, [firstName, lastName]);
+
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
         setUserId(user.uid);
         setEmail(user.email);
 
-        // Check if the user is logged in through Google
         const googleProvider = user.providerData.some(
           (provider) => provider.providerId === "google.com"
         );
@@ -86,6 +83,7 @@ const Profile = () => {
             setFirstName(userData.firstName);
             setLastName(userData.lastName);
             setDisplayName(userData.displayName);
+            setPhoto(userData.photoURL);
           }
         } catch (error) {
           console.log("Error fetching user data:", error);
@@ -100,15 +98,34 @@ const Profile = () => {
 
   const handleEditClick = () => {
     setEditing(true);
+    console.log(photo);
+    console.log(user.photoURL);
+  };
+
+  const { dispatch } = useContext(AuthContext);
+  const handleLogout = () => {
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        console.log("Successfully Logged Out!");
+        dispatch({ type: "LOGOUT" });
+        router.push("/login");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handleSaveClick = async () => {
-    let updatedPhotoURL = user.photoURL || "/user.png";
-
+    let updatedPhotoURL = photo || user.photoURL || "/user.png";
+    console.log(updatedPhotoURL);
     if (photoChanged) {
       updatedPhotoURL = await uploadProfileImage(photo, user.uid);
       await updateProfile(user, { photoURL: updatedPhotoURL });
+    } else {
+      user.photoURL;
     }
+    console.log(updatedPhotoURL);
 
     try {
       await updateDoc(doc(db, "users", user.uid), {
@@ -141,17 +158,13 @@ const Profile = () => {
     <>
       <MainLayout>
         <div className="max-w-xl lg:max-w-3xl mx-auto py-8">
-          <h1 className="text-white text-3xl font-bold mb-6">
-            Hey, this is the user profile
-          </h1>
           <img
             className="w-24 h-24 mb-6 mx-auto rounded-full object-cover"
-            src={user ? user.photoURL || "/user.png" : "/user.png"}
+            src={user ? photo || user.photoURL || "/user.png" : "/user.png"}
             alt="User"
           />
           {editing ? (
             <>
-              {/* Add photo input */}
               <div className="mb-4">
                 <label
                   htmlFor="Photo"
@@ -167,7 +180,6 @@ const Profile = () => {
                   className="w-full text-white bg-blue-700 rounded py-2 px-4"
                 />
               </div>
-              {/* Other inputs */}
               <div className="mb-4">
                 <label
                   htmlFor="FirstName"
@@ -257,6 +269,16 @@ const Profile = () => {
               >
                 Edit
               </button>
+
+              <div className="flex items-center mt-4 lg:mt-0">
+                <button
+                  className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded transition hover:bg-blue-500 focus:outline-none focus:ring"
+                  aria-label="show notifications"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </div>
             </>
           )}
         </div>

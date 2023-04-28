@@ -52,6 +52,7 @@ function LogIn() {
           router.push("/");
         } else {
           await auth.signOut();
+          setError("Please verify email to continue...");
         }
       }
     };
@@ -236,6 +237,12 @@ function LogIn() {
                       </Link>
                     </p>
                   </div>
+                  {error && (
+                    <div className="mt-4 text-red-500">
+                      {error}
+                      <br />
+                    </div>
+                  )}
                   <button
                     onClick={resendVerificationEmail}
                     className="inline-block rounded-md border border-blue-600 bg-blue-600 px-20 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-900"
