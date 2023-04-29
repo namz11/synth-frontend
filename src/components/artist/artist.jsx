@@ -3,14 +3,17 @@ import Link from "next/link";
 import React from "react";
 import TrackListForArtist from "@components/trackList/topTrackForArtist";
 
-function artist({ artistData, artistTopTracksData }) {
+function artist({ artistData, artistTopTracksData, token }) {
   return (
     <>
       <div className="mt-8 flex flex-col ">
         <div className="h-1/4  container mx-auto py-8 flex flex-wrap">
           <div className="w-3/10 flex items-center justify-center px-4">
             <Image
-              src={artistData.images[0].url}
+              src={
+                artistData.images[0].url ||
+                "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
+              }
               alt="Artist Cover"
               width={350}
               height={350}
@@ -28,7 +31,7 @@ function artist({ artistData, artistTopTracksData }) {
         </div>
         <div className="h-3/4 container mx-auto my-8">
           <div className="text-3xl text-white font-semibold">Top Tracks</div>
-          <TrackListForArtist topTracks={artistTopTracksData} />
+          <TrackListForArtist topTracks={artistTopTracksData} token={token} />
         </div>
       </div>
     </>

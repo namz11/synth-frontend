@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import PlaylistTile from "@components/tiles/playlistTile";
+import PlaylistTile from "@components/tiles/userPlaylistTile";
 import MainLayout from "@components/layouts/main-layout";
 import axios from "axios";
 import { FiPlus } from "react-icons/fi";
@@ -20,35 +20,43 @@ const MyPlaylists = () => {
 
   // #FIREBASEAUTH For checking if the user is logged in, the session is active and if the seesion is loading
   const [user, loading] = useAuthState(auth);
+  const [token, setToken] = useState(null);
   const { currentUser } = useContext(AuthContext);
 
   const createPlaylist = async () => {
     try {
       setIsLoading(true);
       const name = document.getElementById("name").value.trim();
-      const { data } = await axios.post("/api/user/playlists", {
-        name,
-        userId: "narmit",
-        headers: {
-          Authorization: `Bearer ${theToken}`,
+      const { data } = await axios.post(
+        "/api/user/playlists",
+        {
+          name,
+          userId: "narmit",
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(data);
       if (data?.success) {
         setIsOpen(false);
-        if (!loading) {
-          if (user) {
-            const promises = [logToken()];
-            // #FIREBASEAUTH Promise.all is used to execute both promises concurrently and wait until they are both resolved.
-            Promise.all(promises).then(([theToken]) => {
-              // #FIREBASEAUTH Once the promises are resolved, the fetchUserPlaylists function is called with resolved token as a parameter.
-              fetchUserPlaylists(theToken);
-            });
-          }
-          fetchUserPlaylists();
-        } else {
-          // FIREBASEAUTH If user is falsy, the code logs a message "Denied due to unauthorized".
-          console.log("Denied due to unauthorized");
-        }
+        fetchUserPlaylists(token);
+        // if (!loading) {
+        //   if (user) {
+        //     const promises = [logToken()];
+        //     // #FIREBASEAUTH Promise.all is used to execute both promises concurrently and wait until they are both resolved.
+        //     Promise.all(promises).then(([theToken]) => {
+        //       // #FIREBASEAUTH Once the promises are resolved, the fetchUserPlaylists function is called with resolved token as a parameter.
+        //       fetchUserPlaylists(theToken);
+        //     });
+        //   }
+        //   // fetchUserPlaylists();
+        // } else {
+        //   // FIREBASEAUTH If user is falsy, the code logs a message "Denied due to unauthorized".
+        //   console.log("Denied due to unauthorized");
+        // }
       } else {
         // TODO show error
       }
@@ -81,6 +89,7 @@ const MyPlaylists = () => {
     if (!loading && user) {
       logToken().then((theToken) => {
         fetchUserPlaylists(theToken);
+        setToken(theToken);
       });
     } else if (!loading) {
       console.log("Denied due to unauthorized");

@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 import TrackList from "@components/trackList/trackList";
 
-function album({ albumData }) {
+function album({ albumData, token }) {
   function formatDate(dateStr) {
     const date = new Date(dateStr);
     const formattedDate = date.toLocaleDateString("en-US", {
@@ -22,7 +22,10 @@ function album({ albumData }) {
           <div className="h-1/4 container mx-auto py-8 flex flex-wrap:nowrap">
             <div className="w-3/10 flex items-center justify-center px-4">
               <Image
-                src={albumData.images[0].url}
+                src={
+                  albumData.images[0].url ||
+                  "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
+                }
                 alt="Album Cover"
                 width={400}
                 height={400}
@@ -56,7 +59,11 @@ function album({ albumData }) {
 
           <div className="h-3/4 container mx-auto mt-4">
             <div className="text-3xl text-white font-semibold">Tracks</div>
-            <TrackList tracks={albumData.tracks} />
+            <TrackList
+              tracks={albumData.tracks}
+              imagesData={albumData.images}
+              token={token}
+            />
             <div className="my-8 text-gray-400 text-sm">
               <p>{formatDate(albumData.release_date)}</p>
               {albumData?.copyrights &&
