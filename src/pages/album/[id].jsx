@@ -17,6 +17,8 @@ const Album = () => {
 
   const [albumData, setAlbumData] = useState(null);
   const [loader, setLoading] = useState(true);
+  const [token, setToken] = useState(null);
+
   useEffect(() => {
     const logToken = async () => {
       if (user) {
@@ -33,6 +35,7 @@ const Album = () => {
           },
         });
         setAlbumData(data);
+        setToken(theToken);
         setLoading(false);
       }
     }
@@ -62,7 +65,7 @@ const Album = () => {
     return (
       <>
         <MainLayout>
-          <AlbumComponent albumData={albumData} />
+          <AlbumComponent albumData={albumData} token={token} />
         </MainLayout>
       </>
     );

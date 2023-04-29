@@ -16,7 +16,7 @@ const Playlist = () => {
 
   const [playlistData, setPlaylistData] = useState(null);
   const [loader, setLoading] = useState(true);
-
+  const [token, setToken] = useState(null);
   const [user, loading] = useAuthState(auth);
   const { currentUser } = useContext(AuthContext);
 
@@ -36,6 +36,7 @@ const Playlist = () => {
           },
         });
         setPlaylistData(data);
+        setToken(theToken);
         setLoading(false);
       }
     }
@@ -65,7 +66,7 @@ const Playlist = () => {
     return (
       <>
         <MainLayout>
-          <PlaylistFromAPI playlistData={playlistData} />
+          <PlaylistFromAPI playlistData={playlistData} token={token} />
         </MainLayout>
       </>
     );

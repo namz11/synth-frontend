@@ -1,19 +1,26 @@
 import axios from "axios";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { RiPlayListAddLine } from "react-icons/ri";
 
-function TrackList({ tracks }) {
+function TrackList({ tracks, imagesData, token }) {
   const [showModal, setShowModal] = useState(false);
+  const [resultModal, setResultModal] = useState(false);
+  const [resultResponse, setResultResponse] = useState(false);
   const [selectedTrackId, setSelectedTrackId] = useState(null);
   const [userPlaylists, setUserPlaylists] = useState(null);
 
   useEffect(() => {
-    async function fetchAlbumData() {
-      const { data } = await axios(`/api/user/playlists/`);
+    async function fetchAlbumData(token) {
+      const { data } = await axios(`/api/user/playlists/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setUserPlaylists(data);
     }
-    fetchAlbumData();
-  });
+    fetchAlbumData(token);
+  }, [token]);
 
   function formatDuration(duration_ms) {
     const seconds = Math.floor((duration_ms / 1000) % 60);
@@ -28,50 +35,80 @@ function TrackList({ tracks }) {
 
   function handlePlaylistSelect(playlistId) {
     if (selectedTrackId && playlistId) {
-      console.log("Selected Track ID:", selectedTrackId);
-      console.log("Selected Playlist ID:", playlistId);
+      const url = `/api/user/playlists/${playlistId}/tracks`;
+      axios
+        .put(
+          url,
+          {
+            tracks: [
+              {
+                id: selectedTrackId,
+                images: imagesData,
+              },
+            ],
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          // Navigate
+          console.log(response.data.message);
+          setResultResponse(response.data.message);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
 
     setShowModal(false);
+    setResultModal(true);
   }
 
   return (
     <>
       <div className="container mx-auto text-white mt-4">
         {tracks.items.map((track) => (
-          <Link key={track.id} href={`#_`}>
-            <div className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer">
+          <div
+            key={track.id}
+            className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer"
+          >
+            <Link href={`#_`}>
               <div className="mr-5 text-white">{track.track_number}</div>
-              <div className="flex-grow">
+            </Link>
+            <div className="flex-grow">
+              <Link href={`#_`}>
                 <div className="font-medium text-white truncate">
                   {track.name}
                 </div>
-                <div className="text-gray-400 flex flex-wrap">
-                  {track.artists.map((artist, index) => (
-                    <React.Fragment key={artist.id}>
-                      <Link href={`/artist/${artist.id}`}>
-                        <p className="text-pink-500 hover:underline">
-                          {artist.name}
-                        </p>
-                      </Link>
-                      {index !== track.artists.length - 1 && (
-                        <span className="text-pink-500">,&nbsp;</span>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </div>
-              </div>
-              <div className="text-gray-400">
-                {formatDuration(track.duration_ms)}
-              </div>
-              <div
-                className="text-blue-300 z-10 ml-5 cursor-pointer"
-                onClick={() => handleAddToPlaylistClick(track.id)}
-              >
-                Add to Playlist
+              </Link>
+              <div className="text-gray-400 flex flex-wrap">
+                {track.artists.map((artist, index) => (
+                  <React.Fragment key={artist.id}>
+                    <Link href={`/artist/${artist.id}`}>
+                      <p className="text-pink-500 hover:underline">
+                        {artist.name}
+                      </p>
+                    </Link>
+                    {index !== track.artists.length - 1 && (
+                      <span className="text-pink-500">,&nbsp;</span>
+                    )}
+                  </React.Fragment>
+                ))}
               </div>
             </div>
-          </Link>
+            <div className="text-gray-400">
+              {formatDuration(track.duration_ms)}
+            </div>
+            <div
+              className="text-blue-300 z-10 ml-5 cursor-pointer"
+              onClick={() => handleAddToPlaylistClick(track.id)}
+            >
+              <RiPlayListAddLine className="text-2xl" />
+            </div>
+          </div>
         ))}
       </div>
 
@@ -92,24 +129,11 @@ function TrackList({ tracks }) {
               &#8203;
             </span>
 
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle           sm:w-full sm:max-w-md">
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full sm:max-w-md">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-pink-100 sm:mx-0 sm:h-10 sm:w-10">
-                    <svg
-                      className="h-6 w-6 text-pink-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+                    <RiPlayListAddLine className="text-2xl text-pink-500" />
                   </div>
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                     <div
@@ -137,6 +161,59 @@ function TrackList({ tracks }) {
                     </div>
                   </div>
                 </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-600 text-base font-medium text-white hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={() => setShowModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {resultModal && resultResponse && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div
+              className="fixed inset-0 transition-opacity"
+              aria-hidden="true"
+            >
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full sm:max-w-md">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <div
+                      className="text-lg leading-6 font-medium text-gray-900"
+                      id="modal-title"
+                    >
+                      {`Track ${resultResponse}`}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-600 text-base font-medium text-white hover:bg-pink-700 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={() => setResultModal(false)}
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>

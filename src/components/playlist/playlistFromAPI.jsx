@@ -2,24 +2,17 @@ import Image from "next/image";
 import React from "react";
 import TrackListForPlaylist from "@components/trackList/trackListForPlaylist";
 
-function playlistFromAPI({ playlistData }) {
-  function getTime(isoString) {
-    const date = new Date(isoString);
-    let hours = date.getUTCHours().toString().padStart(2, "0");
-    const minutes = date.getUTCMinutes().toString().padStart(2, "0");
-    if (Number(hours.slice(0, 1)) === 0) {
-      hours = hours.slice(1);
-    }
-    return `${hours}hr ${minutes}min `;
-  }
-
+function playlistFromAPI({ playlistData, token }) {
   return (
     <>
       <div className="mt-8 flex flex-col ">
         <div className="h-1/4 container mx-auto py-8 flex flex-wrap">
           <div className="w-3/10 flex items-center justify-center px-4">
             <Image
-              src={playlistData.images[0].url}
+              src={
+                playlistData.images[0].url ||
+                "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
+              }
               alt="Artist Cover"
               width={350}
               height={350}
@@ -43,7 +36,10 @@ function playlistFromAPI({ playlistData }) {
         </div>
         <div className="h-3/4 container mx-auto my-8">
           <div className="text-3xl text-white font-semibold">Tracks</div>
-          <TrackListForPlaylist tracks={playlistData.tracks.items} />
+          <TrackListForPlaylist
+            tracks={playlistData.tracks.items}
+            token={token}
+          />
         </div>
       </div>
     </>

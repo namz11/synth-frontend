@@ -17,6 +17,8 @@ const Artist = () => {
 
   const [artistData, setArtistData] = useState(null);
   const [artistTopTracksData, setArtistTopTracksData] = useState(null);
+  const [token, setToken] = useState(null);
+
   const [loader, setLoading] = useState(true);
   useEffect(() => {
     const logToken = async () => {
@@ -44,6 +46,7 @@ const Artist = () => {
           },
         });
         setArtistTopTracksData(data);
+        setToken(theToken);
         setLoading(false);
       }
     }
@@ -74,6 +77,7 @@ const Artist = () => {
           <ArtistComponent
             artistData={artistData}
             artistTopTracksData={artistTopTracksData}
+            token={token}
           />
         </MainLayout>
       </>
