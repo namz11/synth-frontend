@@ -17,7 +17,7 @@ function topTrackForArtist({ topTracks }) {
             <div className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer">
               <div className="mr-5 text-white">{index + 1}</div>
               <Image
-                class="object-cover mr-4"
+                className="object-cover mr-4"
                 src={track.album.images[1].url}
                 alt="Track Cover"
                 width={70}

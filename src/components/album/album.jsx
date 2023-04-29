@@ -33,7 +33,7 @@ function album({ albumData }) {
                 {albumData.type.toUpperCase()}
               </p>
               <p className="text-6xl font-bold mb-2 ">{albumData.name}</p>
-              <h2 className="text-xl font-semibold mb-2 ">
+              <div className="text-xl font-semibold mb-2 ">
                 {albumData.artists.map((artist, index) => (
                   <React.Fragment key={artist.id}>
                     <Link href={`/artist/${artist.id}`}>
@@ -46,7 +46,7 @@ function album({ albumData }) {
                     )}
                   </React.Fragment>
                 ))}
-              </h2>
+              </div>
               <p className="text-blue-300 font-medium">
                 {albumData.total_tracks} Tracks &bull;{" "}
                 {albumData.release_date.slice(0, 4)}

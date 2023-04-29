@@ -1,28 +1,61 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import withAuth from "@components/withAuth";
 import PlaylistFromAPI from "@components/playlist/playlistFromAPI";
 import MainLayout from "@components/layouts/main-layout";
 import axios from "axios";
 
+// #FIREBASEAUTH For authentication and authorisation
+import { AuthContext } from "@context/AuthContext";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth, signIn } from "@utils/firebase";
+
 const Playlist = () => {
   const router = useRouter();
   const { id } = router.query;
 
   const [playlistData, setPlaylistData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loader, setLoading] = useState(true);
+
+  const [user, loading] = useAuthState(auth);
+  const { currentUser } = useContext(AuthContext);
+
   useEffect(() => {
-    async function fetchAlbumData() {
+    const logToken = async () => {
+      if (user) {
+        const token = await user.getIdToken();
+        return token;
+      }
+    };
+
+    async function fetchAlbumData(theToken) {
       if (id) {
-        const { data } = await axios(`/api/playlists/${id}`);
+        const { data } = await axios(`/api/playlists/${id}`, {
+          headers: {
+            Authorization: `Bearer ${theToken}`,
+          },
+        });
         setPlaylistData(data);
         setLoading(false);
       }
     }
-    fetchAlbumData();
-  }, [id]);
 
-  if (loading) {
+    if (!loading) {
+      if (user) {
+        const promises = [logToken()];
+        // #FIREBASEAUTH Promise.all is used to execute both promises concurrently and wait until they are both resolved.
+        Promise.all(promises).then(([theToken]) => {
+          // #FIREBASEAUTH Once the promises are resolved, the fetchFeaturedPlaylists function and the fetchCategoryPlaylists function is called with resolved token as a parameter.
+          fetchAlbumData(theToken);
+        });
+      } else {
+        // FIREBASEAUTH If user is falsy, the code logs a message "Denied due to unauthorized".
+        console.log("Denied due to unauthorized");
+      }
+    }
+  }, [id, user, loading]);
+
+  if (loader) {
     return (
       <>
         <div>Loading</div>

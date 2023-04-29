@@ -1,54 +1,9 @@
-// import Link from "next/link";
-// import React from "react";
-
-// function TrackList({ tracks }) {
-//   function formatDuration(duration_ms) {
-//     const seconds = Math.floor((duration_ms / 1000) % 60);
-//     const minutes = Math.floor(duration_ms / 1000 / 60);
-//     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-//   }
-
-//   return (
-//     <div className="container mx-auto text-white mt-4">
-//       {tracks.items.map((track) => (
-//         <Link key={track.id} href={`#_`}>
-//           <div className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer">
-//             <div className="mr-5 text-white">{track.track_number}</div>
-//             <div className="flex-grow">
-//               <h3 className="font-medium text-white truncate">{track.name}</h3>
-//               <p className="text-gray-400 flex flex-wrap">
-//                 {track.artists.map((artist, index) => (
-//                   <React.Fragment key={artist.id}>
-//                     <Link href={`/artist/${artist.id}`}>
-//                       <div className="text-pink-500 hover:underline">
-//                         {artist.name}
-//                       </div>
-//                     </Link>
-//                     {index !== track.artists.length - 1 && (
-//                       <span className="text-pink-500">,&nbsp;</span>
-//                     )}
-//                   </React.Fragment>
-//                 ))}
-//               </p>
-//             </div>
-//             <div className="text-gray-400">
-//               {formatDuration(track.duration_ms)}
-//             </div>
-//           </div>
-//         </Link>
-//       ))}
-//     </div>
-//   );
-// }
-
-// export default TrackList;
 import axios from "axios";
 import Link from "next/link";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function TrackList({ tracks }) {
   const [showModal, setShowModal] = useState(false);
-  // const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
   const [selectedTrackId, setSelectedTrackId] = useState(null);
   const [userPlaylists, setUserPlaylists] = useState(null);
 
@@ -56,7 +11,6 @@ function TrackList({ tracks }) {
     async function fetchAlbumData() {
       const { data } = await axios(`/api/user/playlists/`);
       setUserPlaylists(data);
-      // setLoading(false);
     }
     fetchAlbumData();
   });
@@ -73,19 +27,11 @@ function TrackList({ tracks }) {
   }
 
   function handlePlaylistSelect(playlistId) {
-    //   const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?uris=spotify:track:${selectedTrackId}`;
-    //   fetch(url, {
-    //     method: "POST",
-    //     headers: {
-    //       Authorization: "Bearer YOUR_ACCESS_TOKEN",
-    //       "Content-Type": "application/json",
-    //     },
-    //   }).then((response) => {
-    //     // Hide the modal after the track has been added
-    //     setShowModal(false);
-    //   });
+    if (selectedTrackId && playlistId) {
+      console.log("Selected Track ID:", selectedTrackId);
+      console.log("Selected Playlist ID:", playlistId);
+    }
 
-    console.log(`${selectedTrackId} & ${playlistId}`);
     setShowModal(false);
   }
 
@@ -97,9 +43,9 @@ function TrackList({ tracks }) {
             <div className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer">
               <div className="mr-5 text-white">{track.track_number}</div>
               <div className="flex-grow">
-                <h3 className="font-medium text-white truncate">
+                <div className="font-medium text-white truncate">
                   {track.name}
-                </h3>
+                </div>
                 <div className="text-gray-400 flex flex-wrap">
                   {track.artists.map((artist, index) => (
                     <React.Fragment key={artist.id}>
@@ -119,7 +65,7 @@ function TrackList({ tracks }) {
                 {formatDuration(track.duration_ms)}
               </div>
               <div
-                className="text-blue-300 ml-5 cursor-pointer"
+                className="text-blue-300 z-10 ml-5 cursor-pointer"
                 onClick={() => handleAddToPlaylistClick(track.id)}
               >
                 Add to Playlist
@@ -166,16 +112,16 @@ function TrackList({ tracks }) {
                     </svg>
                   </div>
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3
+                    <div
                       className="text-lg leading-6 font-medium text-gray-900"
                       id="modal-title"
                     >
                       Add to Playlist
-                    </h3>
+                    </div>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500">
                         Select a playlist to add this track to:
-                      </p>
+                      </div>
 
                       <select
                         className="mt-3 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
