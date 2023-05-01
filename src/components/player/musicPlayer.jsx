@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@utils/firebase";
 import axios from "axios";
@@ -38,6 +38,7 @@ function MusicPlayer() {
       tok = res.data.token;
       setToken(tok);
     };
+
     fetchToken();
   }, []);
 
