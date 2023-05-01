@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import "@styles/globals.css";
 import { AuthContextProvider } from "@context/AuthContext";
+import { PlayerContextProvider } from "@context/PlayerContext";
 
 const App = ({ Component, pageProps }) => {
   return (
@@ -15,7 +16,9 @@ const App = ({ Component, pageProps }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <AuthContextProvider>
-        <Component {...pageProps} />
+        <PlayerContextProvider>
+          <Component {...pageProps} />
+        </PlayerContextProvider>
       </AuthContextProvider>
     </>
   );
