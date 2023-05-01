@@ -1,7 +1,7 @@
 import MainLayout from "@components/layouts/main-layout";
 import React, { useEffect, useState, useContext } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-// TODO aman - fix this import - there is no updateEmail oor updatePassword
+// TODO aman - fix this import - there is no updateEmail oor updatePassword [FIXED]
 import {
   getStorage,
   ref,
