@@ -5,8 +5,8 @@ import TrackListForPlaylist from "@components/trackList/trackListForPlaylist";
 function playlistFromAPI({ playlistData, token }) {
   return (
     <>
-      <div className="mt-8 flex flex-col ">
-        <div className="h-1/4 container mx-auto py-8 flex flex-wrap">
+      <div className="mt-2 lg:mt-6  flex flex-col ">
+        <div className="h-1/4 container mx-auto py-8 flex flex-wrap lg:flex-nowrap">
           <div className="w-3/10 flex items-center justify-center px-4">
             <Image
               src={
@@ -19,10 +19,12 @@ function playlistFromAPI({ playlistData, token }) {
             />
           </div>
           <div className="w-7/10 pl-4 flex flex-col items-start justify-center text-white text-overflow: ellipsis">
-            <p className="text-sm text-blue-300 font-bold mb-2">
+            <p className="text-sm text-blue-300 font-bold mb-2 mt-4 lg:mt-0">
               {playlistData.type.toUpperCase()}
             </p>
-            <h1 className="text-7xl font-bold mb-2">{playlistData.name}</h1>
+            <h1 className="text-3xl lg:text-6xl font-bold mb-2">
+              {playlistData.name}
+            </h1>
             {playlistData.description && (
               <p className="text-xl font-light text-pink-500 mt-4">
                 {playlistData.description.replace(/<\/?[^>]+(>|$)/g, "")}
@@ -35,7 +37,9 @@ function playlistFromAPI({ playlistData, token }) {
           </div>
         </div>
         <div className="h-3/4 container mx-auto my-8">
-          <div className="text-3xl text-white font-semibold">Tracks</div>
+          <div className="text-3xl text-white font-semibold px-4 lg:px-0">
+            Tracks
+          </div>
           <TrackListForPlaylist
             tracks={playlistData.tracks.items}
             token={token}

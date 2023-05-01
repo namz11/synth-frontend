@@ -18,8 +18,8 @@ function album({ albumData, token }) {
   if (albumData) {
     return (
       <>
-        <div className="mt-8 flex flex-col ">
-          <div className="h-1/4 container mx-auto py-8 flex flex-wrap:nowrap">
+        <div className="mt-2 lg:mt-6 flex flex-col ">
+          <div className="h-1/4 container mx-auto py-8 flex flex-wrap lg:flex-nowrap">
             <div className="w-3/10 flex items-center justify-center px-4">
               <Image
                 src={
@@ -32,11 +32,13 @@ function album({ albumData, token }) {
               />
             </div>
             <div className="w-7/10 pl-4 flex flex-col items-start justify-center text-white text-overflow: ellipsis">
-              <p className="text-sm text-blue-300 font-bold mb-2">
+              <p className="text-sm text-blue-300 font-bold mb-2 mt-4 lg:mt-0">
                 {albumData.type.toUpperCase()}
               </p>
-              <p className="text-6xl font-bold mb-2 ">{albumData.name}</p>
-              <div className="text-xl font-semibold mb-2 ">
+              <p className="text-3xl lg:text-5xl font-bold mb-2">
+                {albumData.name}
+              </p>
+              <div className="text-lg lg:text-xl font-semibold mb-2 ">
                 {albumData.artists.map((artist, index) => (
                   <React.Fragment key={artist.id}>
                     <Link href={`/artist/${artist.id}`}>
@@ -58,7 +60,9 @@ function album({ albumData, token }) {
           </div>
 
           <div className="h-3/4 container mx-auto mt-4">
-            <div className="text-3xl text-white font-semibold">Tracks</div>
+            <div className="text-3xl text-white font-semibold px-4 lg:px-0">
+              Tracks
+            </div>
             <TrackList
               tracks={albumData.tracks}
               imagesData={albumData.images}

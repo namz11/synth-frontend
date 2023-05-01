@@ -6,7 +6,7 @@ import TrackListForArtist from "@components/trackList/topTrackForArtist";
 function artist({ artistData, artistTopTracksData, token }) {
   return (
     <>
-      <div className="mt-8 flex flex-col ">
+      <div className="mt-2 lg:mt-6 flex flex-col ">
         <div className="h-1/4  container mx-auto py-8 flex flex-wrap">
           <div className="w-3/10 flex items-center justify-center px-4">
             <Image
@@ -20,17 +20,18 @@ function artist({ artistData, artistTopTracksData, token }) {
             />
           </div>
           <div className="w-7/10 pl-4 flex flex-col items-start justify-center text-white">
-            <p className="text-sm text-blue-300 font-bold mb-2">
+            <div className="text-sm text-blue-300 font-bold mb-2 mt-4 lg:mt-0">
               {artistData.type.toUpperCase()}
-            </p>
-            <h1 className="text-7xl font-bold mb-2">{artistData.name}</h1>
-            {/* <p className="text-blue-300 text-2xl font-medium">
-              Followers: {artistData.followers.total.toLocaleString()} (Spotify)
-            </p> */}
+            </div>
+            <div className="text-3xl lg:text-7xl font-bold mb-2">
+              {artistData.name}
+            </div>
           </div>
         </div>
-        <div className="h-3/4 container mx-auto my-8">
-          <div className="text-3xl text-white font-semibold">Top Tracks</div>
+        <div className="h-3/4 container mx-auto my-6">
+          <div className="text-3xl text-white font-semibold px-4 lg:px-0">
+            Top Tracks
+          </div>
           <TrackListForArtist topTracks={artistTopTracksData} token={token} />
         </div>
       </div>
