@@ -45,25 +45,28 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
             <Link href={`#_`}>
               <span className="mr-5 text-white">{index + 1}</span>
             </Link>
-            <Link href={`#_`}>
-              <Image
-                className="object-cover mr-4"
-                src={
-                  track.album.images[1].url ||
-                  "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
-                }
-                alt="Track Cover"
-                width={70}
-                height={70}
-              />
-            </Link>
+            <div className="hidden md:block">
+              <Link href={`#_`}>
+                <Image
+                  className="object-cover mr-4"
+                  src={
+                    track.album.images[1].url ||
+                    "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
+                  }
+                  alt="Track Cover"
+                  width={70}
+                  height={70}
+                />
+              </Link>
+            </div>
+
             <div className="flex-grow">
               <Link href={`#_`}>
-                <h3 className="font-medium text-white truncate">
+                <div className="font-medium text-xl text-white text-overflow:text-ellipsis hover:underline max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch] ">
                   {track.name}
-                </h3>
+                </div>
               </Link>
-              <p className="text-gray-400 flex flex-wrap">
+              <div className="text-gray-400 flex flex-wrap">
                 {track.artists.map((artist, index) => (
                   <React.Fragment key={artist.id}>
                     <Link href={`/artist/${artist.id}`}>
@@ -76,13 +79,17 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
                     )}
                   </React.Fragment>
                 ))}
-              </p>
-            </div>
-            <Link href={`/album/${track.album.id}`}>
-              <div className="text-blue-300 hover:underline mr-28">
-                {track.album.name}
               </div>
-            </Link>
+            </div>
+
+            <div className="hidden lg:block">
+              <Link href={`/album/${track.album.id}`}>
+                <div className="text-blue-300 hover:underline mr-28">
+                  {track.album.name}
+                </div>
+              </Link>
+            </div>
+
             <div className="text-gray-400">
               {formatDuration(track.duration_ms)}
             </div>
@@ -90,55 +97,36 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
               className="text-pink-500 z-10 ml-5 cursor-pointer"
               onClick={() => handleDeleteTrackClick(track.id, token)}
             >
-              {/* Delete Track */}
-              <MdDelete className="text-2xl" />
+              <MdDelete className="text-xl lg:text-2xl" />
             </div>
           </div>
         ))}
       </div>
 
       {resultModal && resultResponse && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div
-              className="fixed inset-0 transition-opacity"
-              aria-hidden="true"
-            >
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+        <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
+            <div className="text-center">
+              <div className="mt-4">
+                <h3 className="text-lg font-medium text-gray-900">{`Track ${resultResponse}`}</h3>
+              </div>
             </div>
 
-            <span
-              className="hidden sm:inline-block sm:align-middle sm:h-screen"
-              aria-hidden="true"
-            >
-              &#8203;
-            </span>
-
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full sm:max-w-md">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <div
-                      className="text-lg leading-6 font-medium text-gray-900"
-                      id="modal-title"
-                    >
-                      {`Track ${resultResponse}`}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-600 text-base font-medium text-white hover:bg-pink-700 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={() => {
-                    setResultModal(false);
-                    window.location.reload();
-                  }}
-                >
-                  Close
-                </button>
-              </div>
+            <div className="mt-8 text-center">
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-pink-600 rounded-md shadow-sm hover:bg-pink-700 sm:w-auto sm:text-sm"
+                onClick={() => {
+                  setResultModal(false);
+                  window.location.reload();
+                }}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
