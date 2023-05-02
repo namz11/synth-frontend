@@ -15,7 +15,12 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import { checkFirstName, checkLastName, checkEmail } from "@utils/helpers";
+import {
+  checkFirstName,
+  checkLastName,
+  checkEmail,
+  validateImageInput,
+} from "@utils/helpers";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -69,6 +74,7 @@ function SignUp() {
   const [lastnameError, setLastnameError] = useState(false);
   const [firstnameError, setFirstnameError] = useState(false);
   const [dateError, setDateError] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const calculateAge = (dob) => {
     const today = new Date();
@@ -84,6 +90,20 @@ function SignUp() {
 
   const handleSignUp = (e) => {
     e.preventDefault();
+
+    // Image Error Management
+    if (profileImage) {
+      try {
+        const imageTest = validateImageInput(profileImage);
+      } catch (e) {
+        setImageError(e);
+        return;
+      }
+      console.log("Success Most Probably");
+    }
+    if (imageError !== false) {
+      setImageError(false);
+    }
 
     // Firstname Error Management
     try {
@@ -239,6 +259,9 @@ function SignUp() {
                         onChange={(e) => setProfileImage(e.target.files[0])}
                         className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring"
                       />
+                      {imageError && (
+                        <p style={{ color: "red" }}>{imageError}</p>
+                      )}
                     </div>
 
                     <div className="col-span-6 sm:col-span-3">
