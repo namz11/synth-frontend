@@ -122,6 +122,7 @@ const Profile = () => {
     if (photoChanged) {
       updatedPhotoURL = await uploadProfileImage(photo, user.uid);
       await updateProfile(user, { photoURL: updatedPhotoURL });
+      setPhoto(updatedPhotoURL);
     } else {
       user.photoURL;
     }

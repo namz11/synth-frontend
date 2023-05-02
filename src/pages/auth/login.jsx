@@ -36,7 +36,11 @@ function LogIn() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user && user.emailVerified) {
         const userRef = doc(db, "users", user.uid);
-        await updateDoc(userRef, { emailVerified: true });
+
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+          await updateDoc(userRef, { emailVerified: true });
+        }
       }
     });
 
@@ -65,7 +69,7 @@ function LogIn() {
       .then(async (result) => {
         const user = result.user;
         dispatch({ type: "LOGIN", payload: user });
-        const { displayName, email, uid, photoURL } = user;
+        const { displayName, email, uid, photoURL, emailVerified } = user;
         const nameParts = displayName.split(" ");
         const firstName = nameParts[0];
         const lastName =
@@ -81,6 +85,7 @@ function LogIn() {
             displayName,
             email,
             photoURL,
+            emailVerified,
           })
             .then(() => {
               console.log("Document written successfully!");

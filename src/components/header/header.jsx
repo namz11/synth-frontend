@@ -15,6 +15,7 @@ const Header = () => {
   const [user, loading] = useAuthState(auth);
   const { currentUser } = useContext(AuthContext);
   const [photoURL, setPhotoURL] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const router = useRouter();
   const { dispatch } = useContext(AuthContext);
@@ -31,6 +32,17 @@ const Header = () => {
         console.log(error);
       });
   };
+
+  const handleSearchChange = (e) => {
+    e.preventDefault();
+    setSearchTerm(e.target.value);
+  };
+
+  useEffect(() => {
+    if (searchTerm.trim() !== "") {
+      router.push(`/search?query=${searchTerm}`);
+    }
+  }, [searchTerm]);
 
   const logInRedirect = () => {
     console.log("PLEASE LOGIN");
@@ -53,6 +65,7 @@ const Header = () => {
       if (user) {
         if (user.photoURL) {
           setPhotoURL(user.photoURL);
+          fetchUserData(user.uid);
         } else {
           fetchUserData(user.uid);
         }
@@ -163,9 +176,13 @@ const Header = () => {
             </span>
 
             <input
+              autoFocus={router.pathname === "/search"}
               type="text"
               className="w-full py-2 pl-10 pr-4 text-gray-700 bg-white border rounded-lg dark:bg-slate-800 dark:text-gray-300 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-opacity-40 focus:ring-blue-300"
               placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e)}
+              onClick={() => router.push("/search")} // Add this line
             />
           </div>
 
