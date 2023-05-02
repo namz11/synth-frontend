@@ -1,7 +1,7 @@
 import MainLayout from "@components/layouts/main-layout";
 import React, { useEffect, useState, useContext } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-// TODO aman - fix this import - there is no updateEmail oor updatePassword [FIXED]
+// TODO aman - fix this import - there is no updateEmail oor updatePassword
 import {
   getStorage,
   ref,
@@ -122,6 +122,7 @@ const Profile = () => {
     if (photoChanged) {
       updatedPhotoURL = await uploadProfileImage(photo, user.uid);
       await updateProfile(user, { photoURL: updatedPhotoURL });
+      setPhoto(updatedPhotoURL);
     } else {
       user.photoURL;
     }
