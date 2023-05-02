@@ -14,9 +14,16 @@ import { getFirestore, doc, updateDoc, getDoc } from "firebase/firestore";
 import { updateProfile, updatePassword, signOut, getAuth } from "firebase/auth";
 import { AuthContext } from "@context/AuthContext";
 import withAuth from "@components/withAuth";
+import {
+  checkFirstName,
+  checkLastName,
+  validateImageInput,
+} from "@utils/helpers";
+
 const db = getFirestore();
 
 const Profile = () => {
+  const router = useRouter();
   const [user, loading] = useAuthState(auth);
   const [userId, setUserId] = useState(null);
   const [editing, setEditing] = useState(false);
@@ -28,9 +35,12 @@ const Profile = () => {
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [photo, setPhoto] = useState(user.photoURL);
   const [photoChanged, setPhotoChanged] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [isGoogleProvider, setIsGoogleProvider] = useState(false);
-  const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
+  const [lastnameError, setLastnameError] = useState(false);
+  const [firstnameError, setFirstnameError] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const uploadProfileImage = async (file, userUid) => {
     const storage = getStorage();
@@ -109,7 +119,7 @@ const Profile = () => {
       .then(() => {
         console.log("Successfully Logged Out!");
         dispatch({ type: "LOGOUT" });
-        router.push("/login");
+        router.push("/");
       })
       .catch((error) => {
         console.log(error);
@@ -119,6 +129,7 @@ const Profile = () => {
   const handleSaveClick = async () => {
     let updatedPhotoURL = photo || user.photoURL || "/user.png";
     console.log(updatedPhotoURL);
+
     if (photoChanged) {
       updatedPhotoURL = await uploadProfileImage(photo, user.uid);
       await updateProfile(user, { photoURL: updatedPhotoURL });
@@ -136,13 +147,53 @@ const Profile = () => {
         photoURL: updatedPhotoURL,
       });
 
+      // Image Error Management
+      if (photo) {
+        try {
+          const imageTest = validateImageInput(photo);
+        } catch (e) {
+          setImageError(e);
+          return;
+        }
+        console.log("Success Most Probably");
+      }
+      if (imageError !== false) {
+        setImageError(false);
+      }
+
+      // Firstname Error Management
+      try {
+        const firstNameTest = checkFirstName(firstName);
+      } catch (e) {
+        setFirstnameError(e);
+        return;
+      }
+      if (firstnameError !== false) {
+        setFirstnameError(false);
+      }
+
+      // Lastname Error Management
+      try {
+        const lastNameTest = checkLastName(lastName);
+      } catch (e) {
+        setLastnameError(e);
+        return;
+      }
+      if (lastnameError !== false) {
+        setLastnameError(false);
+      }
+
+      // Password Error Management
       if (password) {
         if (password === passwordConfirmation) {
           await updatePassword(user, password);
         } else {
-          setErrorMessage("Error: Passwords do not match");
+          setPasswordError("Passwords do not match");
           return;
         }
+      }
+      if (passwordError !== false) {
+        setPasswordError(false);
       }
 
       setEditing(false);
@@ -180,6 +231,7 @@ const Profile = () => {
                   accept="image/*"
                   className="w-full text-white bg-blue-700 rounded py-2 px-4"
                 />
+                {imageError && <p style={{ color: "red" }}>{imageError}</p>}
               </div>
               <div className="mb-4">
                 <label
@@ -195,6 +247,10 @@ const Profile = () => {
                   onChange={(e) => setFirstName(e.target.value)}
                   className="w-full text-white bg-blue-700 rounded py-2 px-4"
                 />
+                <br />
+                {firstnameError && (
+                  <p style={{ color: "red" }}>{firstnameError}</p>
+                )}
               </div>
               <div className="mb-4">
                 <label
@@ -210,6 +266,10 @@ const Profile = () => {
                   onChange={(e) => setLastName(e.target.value)}
                   className="w-full text-white bg-blue-700 rounded py-2 px-4"
                 />
+                <br />
+                {lastnameError && (
+                  <p style={{ color: "red" }}>{lastnameError}</p>
+                )}
               </div>
               {!isGoogleProvider && (
                 <>
@@ -249,9 +309,11 @@ const Profile = () => {
                   </div>
                 </>
               )}
-              {errorMessage && (
-                <div className="text-red-500 mt-2">{errorMessage}</div>
-              )}
+              {/* {passwordError && (
+                <div className="text-red-500 mt-2">{passwordError}</div>
+              )} */}
+              {/* <br /> */}
+              {passwordError && <p style={{ color: "red" }}>{passwordError}</p>}
               <button
                 onClick={handleSaveClick}
                 className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded transition hover:bg-blue-500 focus:outline-none focus:ring"
