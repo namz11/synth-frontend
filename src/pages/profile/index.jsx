@@ -14,7 +14,11 @@ import { getFirestore, doc, updateDoc, getDoc } from "firebase/firestore";
 import { updateProfile, updatePassword, signOut, getAuth } from "firebase/auth";
 import { AuthContext } from "@context/AuthContext";
 import withAuth from "@components/withAuth";
-import { checkFirstName, checkLastName, checkEmail } from "@utils/helpers";
+import {
+  checkFirstName,
+  checkLastName,
+  validateImageInput,
+} from "@utils/helpers";
 
 const db = getFirestore();
 
@@ -36,6 +40,7 @@ const Profile = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [lastnameError, setLastnameError] = useState(false);
   const [firstnameError, setFirstnameError] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const uploadProfileImage = async (file, userUid) => {
     const storage = getStorage();
@@ -124,6 +129,7 @@ const Profile = () => {
   const handleSaveClick = async () => {
     let updatedPhotoURL = photo || user.photoURL || "/user.png";
     console.log(updatedPhotoURL);
+
     if (photoChanged) {
       updatedPhotoURL = await uploadProfileImage(photo, user.uid);
       await updateProfile(user, { photoURL: updatedPhotoURL });
@@ -140,6 +146,20 @@ const Profile = () => {
         lastName,
         photoURL: updatedPhotoURL,
       });
+
+      // Image Error Management
+      if (photo) {
+        try {
+          const imageTest = validateImageInput(photo);
+        } catch (e) {
+          setImageError(e);
+          return;
+        }
+        console.log("Success Most Probably");
+      }
+      if (imageError !== false) {
+        setImageError(false);
+      }
 
       // Firstname Error Management
       try {
@@ -211,6 +231,7 @@ const Profile = () => {
                   accept="image/*"
                   className="w-full text-white bg-blue-700 rounded py-2 px-4"
                 />
+                {imageError && <p style={{ color: "red" }}>{imageError}</p>}
               </div>
               <div className="mb-4">
                 <label
