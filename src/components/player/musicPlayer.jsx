@@ -1,15 +1,16 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@utils/firebase";
 import axios from "axios";
-import PlayerContext from "@context/PlayerContext";
 import SpotifyPlayer from "react-spotify-web-playback";
+import { useDispatch } from "react-redux";
+import playerActions from "@utils/playerActions";
 
 function MusicPlayer() {
-  const { player, setPlayer } = useContext(PlayerContext);
   const [user, loading] = useAuthState(auth);
   const [token, setToken] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -40,32 +41,35 @@ function MusicPlayer() {
     };
 
     fetchToken();
-  }, []);
+  }, [user, loading]);
 
   return (
-    // Make this div stick to the bottom of the page.
-    <div className="fixed bottom-0 w-full">
-      <SpotifyPlayer
-        token={token}
-        uris={["spotify:track:4h9wh7iOZ0GGn8QVp4RAOB"]}
-        play={false}
-        callback={(state) => {
-          console.log(state);
-        }}
-        styles={{
-          bgColor: "#1e1e1e",
-          color: "#fff",
-          loaderColor: "#fff",
-          sliderColor: "#1cb954",
-          savedColor: "#fff",
-          trackArtistColor: "#ccc",
-          trackNameColor: "#fff",
-        }}
-        hideAttribution={true}
-        layout="responsive"
-        magnifySliderOnHover={true}
-      ></SpotifyPlayer>
-    </div>
+    user && (
+      <div className="fixed bottom-0 w-full">
+        <SpotifyPlayer
+          token={token}
+          uris={["spotify:track:4h9wh7iOZ0GGn8QVp4RAOB"]}
+          play={false}
+          callback={(state) => {
+            if (state.deviceId) {
+              dispatch(playerActions.setDeviceId(state.deviceId));
+            }
+          }}
+          styles={{
+            bgColor: "#1e1e1e",
+            color: "#fff",
+            loaderColor: "#fff",
+            sliderColor: "#1cb954",
+            savedColor: "#fff",
+            trackArtistColor: "#ccc",
+            trackNameColor: "#fff",
+          }}
+          hideAttribution={true}
+          layout="responsive"
+          magnifySliderOnHover={true}
+        ></SpotifyPlayer>
+      </div>
+    )
   );
 }
 
