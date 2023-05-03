@@ -39,6 +39,7 @@ function MusicPlayer() {
     user && (
       <div className="fixed bottom-0 w-full">
         <SpotifyPlayer
+          name="Synth Music Player"
           token={token}
           uris={["spotify:track:4h9wh7iOZ0GGn8QVp4RAOB"]}
           play={false}
@@ -49,10 +50,10 @@ function MusicPlayer() {
             }
           }}
           styles={{
-            bgColor: "#1e1e1e",
+            bgColor: "#1f2937",
             color: "#fff",
             loaderColor: "#fff",
-            sliderColor: "#1cb954",
+            sliderColor: "#EC4899",
             savedColor: "#fff",
             trackArtistColor: "#ccc",
             trackNameColor: "#fff",
