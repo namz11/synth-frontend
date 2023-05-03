@@ -43,10 +43,18 @@ function MusicPlayer() {
           token={token}
           uris={["spotify:track:4h9wh7iOZ0GGn8QVp4RAOB"]}
           play={false}
-          callback={(state) => {
+          callback={async (state) => {
             // Set the device id in storage
             if (state.deviceId) {
               setDeviceId(state.deviceId);
+            }
+            if (!state.token) {
+              let tok = user.getIdToken();
+              state.token = await axios.get("/api/token", {
+                headers: {
+                  Authorization: `Bearer ${tok}`,
+                },
+              });
             }
           }}
           styles={{
