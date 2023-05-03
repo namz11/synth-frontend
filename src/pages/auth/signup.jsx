@@ -15,6 +15,12 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
+import {
+  checkFirstName,
+  checkLastName,
+  checkEmail,
+  validateImageInput,
+} from "@utils/helpers";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -63,6 +69,12 @@ function SignUp() {
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const recaptchaVerifierRef = useRef(null);
   const [error, setError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [lastnameError, setLastnameError] = useState(false);
+  const [firstnameError, setFirstnameError] = useState(false);
+  const [dateError, setDateError] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const calculateAge = (dob) => {
     const today = new Date();
@@ -79,14 +91,71 @@ function SignUp() {
   const handleSignUp = (e) => {
     e.preventDefault();
 
-    if (password !== passwordConfirmation) {
-      setError("Passwords do not match");
-      return;
+    // Image Error Management
+    if (profileImage) {
+      try {
+        const imageTest = validateImageInput(profileImage);
+      } catch (e) {
+        setImageError(e);
+        return;
+      }
+      console.log("Success Most Probably");
+    }
+    if (imageError !== false) {
+      setImageError(false);
     }
 
-    if (calculateAge(dob) < 13) {
-      setError("You need to be at least 13 years old to use our services");
+    // Firstname Error Management
+    try {
+      const firstNameTest = checkFirstName(firstName);
+    } catch (e) {
+      setFirstnameError(e);
       return;
+    }
+    if (firstnameError !== false) {
+      setFirstnameError(false);
+    }
+
+    // Lastname Error Management
+    try {
+      const lastNameTest = checkLastName(lastName);
+    } catch (e) {
+      setLastnameError(e);
+      return;
+    }
+    if (lastnameError !== false) {
+      setLastnameError(false);
+    }
+
+    // Email Error Management
+    try {
+      const emailTest = checkEmail(email);
+    } catch (e) {
+      setEmailError(e);
+      return;
+    }
+    if (emailError !== false) {
+      setEmailError(false);
+    }
+
+    // Password Error Management
+    if (password !== passwordConfirmation) {
+      setPasswordError("Passwords do not match");
+      return;
+    }
+    if (passwordError !== false) {
+      setPasswordError(false);
+    }
+
+    // Date Error Management
+    if (calculateAge(dob) < 13) {
+      setDateError(
+        "We're sorry, but you must be at least 13 years old in order to use our services."
+      );
+      return;
+    }
+    if (dateError !== false) {
+      setDateError(false);
     }
 
     signUp(auth, email, password)
@@ -190,6 +259,9 @@ function SignUp() {
                         onChange={(e) => setProfileImage(e.target.files[0])}
                         className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring"
                       />
+                      {imageError && (
+                        <p style={{ color: "red" }}>{imageError}</p>
+                      )}
                     </div>
 
                     <div className="col-span-6 sm:col-span-3">
@@ -209,6 +281,10 @@ function SignUp() {
                         className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring"
                         required
                       />
+                      <br />
+                      {firstnameError && (
+                        <p style={{ color: "red" }}>{firstnameError}</p>
+                      )}
                     </div>
 
                     <div className="col-span-6 sm:col-span-3">
@@ -228,6 +304,10 @@ function SignUp() {
                         className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring"
                         required
                       />
+                      <br />
+                      {lastnameError && (
+                        <p style={{ color: "red" }}>{lastnameError}</p>
+                      )}
                     </div>
                     <div className="col-span-6 sm:col-span-3">
                       <label
@@ -248,12 +328,14 @@ function SignUp() {
                             }`
                           )
                         }
+                        dateFormat="MM/dd/yyyy"
                         isClearable
                         showYearDropdown
                         scrollableMonthYearDropdown
                         closeCalendar
                         required={true}
                       />
+                      {dateError && <p style={{ color: "red" }}>{dateError}</p>}
                     </div>
                     <div className="col-span-6">
                       <label
@@ -273,6 +355,10 @@ function SignUp() {
                         className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring"
                         required
                       />
+                      <br />
+                      {emailError && (
+                        <p style={{ color: "red" }}>{emailError}</p>
+                      )}
                     </div>
 
                     <div className="col-span-6 sm:col-span-3">
@@ -315,10 +401,13 @@ function SignUp() {
                         className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring"
                         required
                       />
+                      <br />
+                      {passwordError && (
+                        <p style={{ color: "red" }}>{passwordError}</p>
+                      )}
                     </div>
 
                     <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                      {error && <p style={{ color: "red" }}>{error}</p>}
                       <button
                         className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
                         type="submit"
