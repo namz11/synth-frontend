@@ -1,28 +1,20 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@utils/firebase";
 import axios from "axios";
 import SpotifyPlayer from "react-spotify-web-playback";
-import { useDispatch } from "react-redux";
-import playerActions from "@utils/playerActions";
+import { PlayerContext } from "@context/PlayerContext";
 
 function MusicPlayer() {
   const [user, loading] = useAuthState(auth);
   const [token, setToken] = useState(null);
-  const dispatch = useDispatch();
+  const [deviceId, setDeviceId] = useContext(PlayerContext);
 
   useEffect(() => {
     const fetchToken = async () => {
       // Wait until not loading and user is defined.
-      await new Promise((resolve) => {
-        const interval = setInterval(() => {
-          if (!loading && user) {
-            clearInterval(interval);
-            resolve();
-          }
-        }, 100);
-      });
+      if (loading || !user) return;
 
       // Get the spotify token from the backend api.
       let res, tok;
@@ -51,8 +43,9 @@ function MusicPlayer() {
           uris={["spotify:track:4h9wh7iOZ0GGn8QVp4RAOB"]}
           play={false}
           callback={(state) => {
+            // Set the device id in storage
             if (state.deviceId) {
-              dispatch(playerActions.setDeviceId(state.deviceId));
+              setDeviceId(state.deviceId);
             }
           }}
           styles={{

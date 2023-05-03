@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import "@styles/globals.css";
 import { AuthContextProvider } from "@context/AuthContext";
-import store from "@utils/store";
 import MusicPlayer from "@components/player/musicPlayer";
-import { Provider } from "react-redux";
+import { PlayerContextProvider } from "@context/PlayerContext";
 
 const App = ({ Component, pageProps }) => {
   return (
@@ -18,10 +17,10 @@ const App = ({ Component, pageProps }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <AuthContextProvider>
-        <Provider store={store}>
+        <PlayerContextProvider>
           <Component {...pageProps} />
           <MusicPlayer />
-        </Provider>
+        </PlayerContextProvider>
       </AuthContextProvider>
     </>
   );
