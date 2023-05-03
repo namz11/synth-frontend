@@ -1,8 +1,10 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import TrackListForPlaylist from "@components/trackList/trackListForUserPlaylist";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { PlayerContext } from "@context/PlayerContext";
+import { spotifyApi } from "react-spotify-web-playback";
 
 function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
   const router = useRouter();
@@ -10,6 +12,7 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
   const [resultResponse, setResultResponse] = useState(false);
   const [nameModal, setNameModal] = useState(false);
   const [newName, setNewName] = useState("");
+  const [deviceId, setDeviceId] = useContext(PlayerContext);
 
   function handleDeletePlaylist() {
     const url = `/api/user/playlists/${playlistId}`;
@@ -62,6 +65,26 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
       });
     setNameModal(false);
   };
+
+  // Play the track list on spotify player.
+  async function handlePlayerAdd(trackUriList) {
+    let spotifyToken;
+    const getSpotifyToken = async () => {
+      spotifyToken = await axios(`/api/token`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    };
+    await getSpotifyToken();
+    spotifyToken = spotifyToken.data.token;
+
+    // Get the device id of the spotify player from context.
+    await spotifyApi.play(spotifyToken, {
+      uris: trackUriList,
+      deviceId: deviceId,
+    });
+  }
 
   return (
     <>
@@ -119,6 +142,18 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
         <div className="h-3/4 container mx-auto mb-8 mt-4">
           <div className="text-3xl text-white font-semibold px-4 lg:px-0">
             Tracks
+          </div>
+          <div
+            className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer mt-3"
+            onClick={() => {
+              let trackUriList = [];
+              tracksData.forEach((track) => {
+                trackUriList.push(track.uri);
+              });
+              handlePlayerAdd(trackUriList);
+            }}
+          >
+            Listen Now
           </div>
           <TrackListForPlaylist
             tracks={tracksData}

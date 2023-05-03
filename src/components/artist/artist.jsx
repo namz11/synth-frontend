@@ -2,8 +2,36 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import TrackListForArtist from "@components/trackList/topTrackForArtist";
+import { spotifyApi } from "react-spotify-web-playback";
+import { PlayerContext } from "@context/PlayerContext";
+import { useContext } from "react";
+import axios from "axios";
 
-function artist({ artistData, artistTopTracksData, token }) {
+function Artist({ artistData, artistTopTracksData, token }) {
+  const [deviceId, setDeviceId] = useContext(PlayerContext);
+
+  // Play the track list on spotify player.
+  async function handlePlayerAdd(trackUriList) {
+    let spotifyToken;
+    const getSpotifyToken = async () => {
+      spotifyToken = await axios(`/api/token`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    };
+    await getSpotifyToken();
+    spotifyToken = spotifyToken.data.token;
+
+    // Get the device id of the spotify player from context.
+    await spotifyApi.play(spotifyToken, {
+      uris: trackUriList,
+      deviceId: deviceId,
+    });
+  }
+
+  console.log(artistTopTracksData);
+
   return (
     <>
       <div className="mt-2 lg:mt-6 flex flex-col ">
@@ -32,6 +60,18 @@ function artist({ artistData, artistTopTracksData, token }) {
           <div className="text-3xl text-white font-semibold px-4 lg:px-0">
             Top Tracks
           </div>
+          <div
+            className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer mt-3"
+            onClick={() => {
+              let trackUriList = [];
+              artistTopTracksData.tracks.forEach((track) => {
+                trackUriList.push(track.uri);
+              });
+              handlePlayerAdd(trackUriList);
+            }}
+          >
+            Listen Now
+          </div>
           <TrackListForArtist topTracks={artistTopTracksData} token={token} />
         </div>
       </div>
@@ -39,4 +79,4 @@ function artist({ artistData, artistTopTracksData, token }) {
   );
 }
 
-export default artist;
+export default Artist;

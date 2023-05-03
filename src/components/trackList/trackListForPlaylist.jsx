@@ -1,8 +1,10 @@
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
-import { RiPlayListAddLine } from "react-icons/ri";
+import React, { useState, useEffect, useContext } from "react";
+import { RiPlayListAddLine, BsMusicNoteList } from "react-icons/ri";
+import { spotifyApi } from "react-spotify-web-playback";
+import { PlayerContext } from "@context/PlayerContext";
 
 function TopTrackForPlaylist({ tracks, token }) {
   const [showModal, setShowModal] = useState(false);
@@ -12,6 +14,8 @@ function TopTrackForPlaylist({ tracks, token }) {
   const [resultModal, setResultModal] = useState(false);
   const [resultResponse, setResultResponse] = useState(false);
   const [imagesForTracks, setimagesForTracks] = useState([]);
+
+  const [deviceId, setDeviceId] = useContext(PlayerContext);
 
   useEffect(() => {
     async function fetchAlbumData(token) {
@@ -70,6 +74,27 @@ function TopTrackForPlaylist({ tracks, token }) {
     setResultModal(true);
   }
 
+  async function handlePlayerAdd(trackUriList) {
+    let spotifyToken;
+    const getSpotifyToken = async () => {
+      spotifyToken = await axios(`/api/token`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    };
+    await getSpotifyToken();
+    spotifyToken = spotifyToken.data.token;
+
+    // Get the device id of the spotify player from context.
+    console.log(trackUriList);
+    await spotifyApi.play(spotifyToken, {
+      uris: trackUriList,
+      deviceId: deviceId,
+    });
+  }
+
+  console.log(tracks);
   return (
     <>
       <div className="container mx-auto text-white mt-4">
@@ -129,6 +154,12 @@ function TopTrackForPlaylist({ tracks, token }) {
 
             <div className="text-gray-400">
               {formatDuration(track.track.duration_ms)}
+            </div>
+            <div
+              className="text-gray-400 ml-5"
+              onClick={() => handlePlayerAdd([track.track.uri])}
+            >
+              Listen to this song!
             </div>
             <div
               className="text-blue-300 z-10 ml-5 cursor-pointer"

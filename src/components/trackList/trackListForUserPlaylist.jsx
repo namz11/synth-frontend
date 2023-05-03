@@ -1,12 +1,15 @@
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { MdDelete } from "react-icons/md";
+import { spotifyApi } from "react-spotify-web-playback";
+import { PlayerContext } from "@context/PlayerContext";
 
 function TrackListForUserPlaylist({ tracks, playlistId, token }) {
   const [resultModal, setResultModal] = useState(false);
   const [resultResponse, setResultResponse] = useState(false);
+  const [deviceId, setDeviceId] = useContext(PlayerContext);
   function formatDuration(duration_ms) {
     const seconds = Math.floor((duration_ms / 1000) % 60);
     const minutes = Math.floor(duration_ms / 1000 / 60);
@@ -32,6 +35,26 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
         setResultResponse(error.message);
       });
     setResultModal(true);
+  }
+
+  async function handlePlayerAdd(trackUriList) {
+    let spotifyToken;
+    const getSpotifyToken = async () => {
+      spotifyToken = await axios(`/api/token`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    };
+    await getSpotifyToken();
+    spotifyToken = spotifyToken.data.token;
+
+    // Get the device id of the spotify player from context.
+    console.log(trackUriList);
+    await spotifyApi.play(spotifyToken, {
+      uris: trackUriList,
+      deviceId: deviceId,
+    });
   }
 
   return (
@@ -92,6 +115,12 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
 
             <div className="text-gray-400">
               {formatDuration(track.duration_ms)}
+            </div>
+            <div
+              className="text-gray-400 ml-5"
+              onClick={() => handlePlayerAdd([track.uri])}
+            >
+              Listen to this song!
             </div>
             <div
               className="text-pink-500 z-10 ml-5 cursor-pointer"

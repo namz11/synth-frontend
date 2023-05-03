@@ -1,8 +1,33 @@
 import Image from "next/image";
-import React from "react";
+import React, { useContext } from "react";
 import TrackListForPlaylist from "@components/trackList/trackListForPlaylist";
+import axios from "axios";
+import { spotifyApi } from "react-spotify-web-playback";
+import { PlayerContext } from "@context/PlayerContext";
 
-function playlistFromAPI({ playlistData, token }) {
+function PlaylistFromAPI({ playlistData, token }) {
+  const [deviceId, setDeviceId] = useContext(PlayerContext);
+
+  // Play the full playlist
+  async function handlePlayerAdd(contextUri) {
+    let spotifyToken;
+    const getSpotifyToken = async () => {
+      spotifyToken = await axios(`/api/token`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    };
+    await getSpotifyToken();
+    spotifyToken = spotifyToken.data.token;
+
+    // Get the device id of the spotify player from context.
+    await spotifyApi.play(spotifyToken, {
+      context_uri: contextUri,
+      deviceId: deviceId,
+    });
+  }
+
   return (
     <>
       <div className="mt-2 lg:mt-6  flex flex-col ">
@@ -40,6 +65,12 @@ function playlistFromAPI({ playlistData, token }) {
           <div className="text-3xl text-white font-semibold px-4 lg:px-0">
             Tracks
           </div>
+          <div
+            className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer mt-3"
+            onClick={() => handlePlayerAdd(playlistData.uri)}
+          >
+            Listen Now
+          </div>
           <TrackListForPlaylist
             tracks={playlistData.tracks.items}
             token={token}
@@ -50,4 +81,4 @@ function playlistFromAPI({ playlistData, token }) {
   );
 }
 
-export default playlistFromAPI;
+export default PlaylistFromAPI;
