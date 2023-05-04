@@ -31,7 +31,6 @@ const MyPlaylists = () => {
         "/api/user/playlists",
         {
           name,
-          userId: "narmit",
         },
         {
           headers: {
