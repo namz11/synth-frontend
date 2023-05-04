@@ -8,6 +8,7 @@ const TrackTile = ({ data }) => {
     // TODO dominick
     console.log(data);
   };
+
   if (data) {
     return (
       <>

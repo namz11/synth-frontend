@@ -56,7 +56,6 @@ function LogIn() {
           router.push("/");
         } else {
           await auth.signOut();
-          setError("Please verify email to continue...");
         }
       }
     };
@@ -111,6 +110,10 @@ function LogIn() {
   const [error, setError] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [verificationError, setVerificationError] = useState(false);
+  const [verificationModal, setVerificationModal] = useState(false);
+  const [loginError, setLoginError] = useState(false);
+  const [loginModal, setLoginModal] = useState(false);
 
   const resendVerificationEmail = async () => {
     try {
@@ -137,14 +140,48 @@ function LogIn() {
         console.log(`EMAIL VERIFIED? ${user.emailVerified}`);
       }
       if (user.emailVerified === true) {
+        setVerificationError(false);
         dispatch({ type: "LOGIN", payload: user });
         router.push("/");
       } else {
-        setError("Please verify your email before logging in.");
+        setVerificationError("Please verify your email before logging in.");
+        setVerificationModal(true);
+        resendVerificationEmail();
       }
     } catch (error) {
-      const errorMessage = error.message;
-      console.log(errorMessage);
+      const errorMessage = error.code;
+      switch (errorMessage) {
+        case "auth/invalid-email":
+          setLoginError(
+            "Invalid email format. Please enter a valid email address."
+          );
+          break;
+        case "auth/user-disabled":
+          setLoginError(
+            "This account has been disabled. Please contact our support team for assistance."
+          );
+          break;
+        case "auth/user-not-found":
+          setLoginError(
+            "No account found for this email. Please check the email or create a new account."
+          );
+
+          break;
+        case "auth/wrong-password":
+          setLoginError("Incorrect email or password. Please try again.");
+          break;
+        case "auth/too-many-requests":
+          setLoginError(
+            "Too many attempts. Please wait a few minutes before trying again."
+          );
+
+          break;
+        default:
+          setLoginError(
+            "An unexpected error occurred. Please try again later."
+          );
+      }
+      setLoginModal(true);
     }
   };
 
@@ -242,18 +279,6 @@ function LogIn() {
                       </Link>
                     </p>
                   </div>
-                  {error && (
-                    <div className="mt-4 text-red-500">
-                      {error}
-                      <br />
-                    </div>
-                  )}
-                  <button
-                    onClick={resendVerificationEmail}
-                    className="inline-block rounded-md border border-blue-600 bg-blue-600 px-20 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-900"
-                  >
-                    Resend Verification Email
-                  </button>
                 </form>
                 <div className="mt-6 grid grid-cols-4 gap-2">
                   <div className="col-span-4 sm:col-span-2">
@@ -281,6 +306,72 @@ function LogIn() {
           </div>
         </section>
       </div>
+      {verificationModal && verificationError && (
+        <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
+            <div className="text-center">
+              <div className="mt-4">
+                <h3 className="text-lg font-medium text-gray-900">
+                  Email Verification Pending
+                </h3>
+                <div className="mt-2">
+                  <div className="text-sm text-gray-500">
+                    We have just sent you an email with a verification link to
+                    confirm your email address. Please check your inbox and
+                    follow the instructions to complete the verification
+                    process.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-pink-600 rounded-md shadow-sm hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 sm:w-auto sm:text-sm"
+                onClick={() => setVerificationModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {loginModal && loginError && (
+        <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
+            <div className="text-center">
+              <div className="mt-4">
+                <h3 className="text-lg font-medium text-gray-900">Oops!</h3>
+                <div className="mt-2">
+                  <div className="text-sm text-gray-500">{loginError}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-pink-600 rounded-md shadow-sm hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 sm:w-auto sm:text-sm"
+                onClick={() => {
+                  setLoginModal(false);
+                  setLoginError(false);
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
