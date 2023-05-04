@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PlaylistTile from "@components/tiles/playlistTile";
 import TrackTile from "@components/tiles/trackTile";
 
-const Scroller = ({ title, tagline, items, isTracks }) => {
+const Scroller = ({ title, tagline, items, isTracks, token }) => {
   return (
     <>
       <div className="mx-auto px-4 sm:px-8 lg:px-12 my-4">
@@ -16,7 +16,7 @@ const Scroller = ({ title, tagline, items, isTracks }) => {
             items.length > 0 &&
             items.map((item) => {
               if (isTracks) {
-                return <TrackTile key={item?.id} data={item} />;
+                return <TrackTile key={item?.id} data={item} token={token} />;
               } else {
                 return <PlaylistTile key={item?.id} data={item} />;
               }

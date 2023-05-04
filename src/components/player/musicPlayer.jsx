@@ -35,6 +35,24 @@ function MusicPlayer() {
     fetchToken();
   }, [user, loading]);
 
+  const refetchToken = async () => {
+    // Get the spotify token from the backend api.
+    let res, tok;
+    tok = await user.getIdToken();
+    try {
+      res = await axios.get("/api/token", {
+        headers: {
+          Authorization: `Bearer ${tok}`,
+        },
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    tok = res.data.token;
+    setToken(tok);
+    return tok;
+  };
+
   return (
     user && (
       <div className="fixed bottom-0 w-full">
@@ -47,14 +65,6 @@ function MusicPlayer() {
             // Set the device id in storage
             if (state.deviceId) {
               setDeviceId(state.deviceId);
-            }
-            if (!state.token) {
-              let tok = user.getIdToken();
-              state.token = await axios.get("/api/token", {
-                headers: {
-                  Authorization: `Bearer ${tok}`,
-                },
-              });
             }
           }}
           styles={{
@@ -69,6 +79,9 @@ function MusicPlayer() {
           hideAttribution={true}
           layout="responsive"
           magnifySliderOnHover={true}
+          getOAuthToken={(cb) => {
+            cb(refetchToken());
+          }}
         ></SpotifyPlayer>
       </div>
     )

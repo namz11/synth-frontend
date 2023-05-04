@@ -1,9 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useContext } from "react";
 import TrackList from "@components/trackList/trackList";
+import axios from "axios";
+import { spotifyApi } from "react-spotify-web-playback";
+import { PlayerContext } from "@context/PlayerContext";
 
-function album({ albumData, token }) {
+function Album({ albumData, token }) {
+  const [deviceId, setDeviceId] = useContext(PlayerContext);
+
   function formatDate(dateStr) {
     const date = new Date(dateStr);
     const formattedDate = date.toLocaleDateString("en-US", {
@@ -13,6 +18,26 @@ function album({ albumData, token }) {
     });
 
     return formattedDate;
+  }
+
+  // Play the full album
+  async function handlePlayerAdd(contextUri) {
+    let spotifyToken;
+    const getSpotifyToken = async () => {
+      spotifyToken = await axios(`/api/token`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    };
+    await getSpotifyToken();
+    spotifyToken = spotifyToken.data.token;
+
+    // Get the device id of the spotify player from context.
+    await spotifyApi.play(spotifyToken, {
+      context_uri: contextUri,
+      deviceId: deviceId,
+    });
   }
 
   if (albumData) {
@@ -63,6 +88,12 @@ function album({ albumData, token }) {
             <div className="text-3xl text-white font-semibold px-4 lg:px-0">
               Tracks
             </div>
+            <div
+              className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md py-4 hover:bg-gray-800 cursor-pointer mt-3"
+              onClick={() => handlePlayerAdd(albumData.uri)}
+            >
+              Listen Now
+            </div>
             <TrackList
               tracks={albumData.tracks}
               imagesData={albumData.images}
@@ -91,4 +122,4 @@ function album({ albumData, token }) {
   }
 }
 
-export default album;
+export default Album;

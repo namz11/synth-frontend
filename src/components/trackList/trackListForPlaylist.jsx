@@ -269,6 +269,12 @@ function TopTrackForPlaylist({ tracks, token }) {
                 {formatDuration(track.track.duration_ms)}
               </div>
               <div
+                className="text-gray-400 ml-5"
+                onClick={() => handlePlayerAdd([track.track.uri])}
+              >
+                Listen to this song!
+              </div>
+              <div
                 className="text-blue-300 z-10 ml-5 cursor-pointer"
                 onClick={() =>
                   handleAddToPlaylistClick(

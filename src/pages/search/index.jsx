@@ -17,10 +17,12 @@ const Search = () => {
   const [artists, setArtists] = useState(null);
   const [albums, setAlbums] = useState(null);
   const [playlists, setPlaylists] = useState(null);
+  const [token, setToken] = useState(null);
 
   const logToken = async () => {
     if (user) {
       const token = await user.getIdToken();
+      setToken(token);
       return token;
     }
   };
@@ -51,7 +53,12 @@ const Search = () => {
     <>
       <MainLayout>
         {tracks && tracks?.length > 0 && (
-          <Scroller title={"Tracks"} items={tracks || []} isTracks={true} />
+          <Scroller
+            title={"Tracks"}
+            items={tracks || []}
+            isTracks={true}
+            token={token}
+          />
         )}
         {artists && artists?.length > 0 && (
           <ScrollerTwo
