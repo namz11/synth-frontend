@@ -182,9 +182,9 @@ function TopTrackForArtist({ topTracks, token }) {
                 <RiPlayListAddLine className="text-2xl text-pink-500" />
               </div>
               <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900">
+                <div className="text-lg font-medium text-gray-900">
                   Add to Playlist
-                </h3>
+                </div>
                 <div className="mt-2">
                   <div className="text-sm text-gray-500">
                     Select a playlist to add this track to:
@@ -226,7 +226,7 @@ function TopTrackForArtist({ topTracks, token }) {
           <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
             <div className="text-center">
               <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900">{`Track ${resultResponse}`}</h3>
+                <div className="text-lg font-medium text-gray-900">{`Track ${resultResponse}`}</div>
               </div>
             </div>
 
