@@ -1,4 +1,4 @@
-import Image from "next/image";
+// import Image from "next/image";
 import React, { useState, useContext } from "react";
 import TrackListForPlaylist from "@components/trackList/trackListForUserPlaylist";
 import { useRouter } from "next/router";
@@ -57,8 +57,6 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
       )
       .then((response) => {
         setResultResponse(response.data.message);
-        setNewName("");
-        window.location.reload();
       })
       .catch((error) => {
         setResultResponse(error);
@@ -115,7 +113,7 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
               {`playlist`.toUpperCase()}
             </p>
             <p className="text-4xl lg:text-7xl font-bold mb-2">
-              {playlistData.data.name}
+              {newName || playlistData.data.name}
             </p>
             {playlistData.data.tracks !== [] && playlistData.data.userId && (
               <p className="text-pink-500 text-lg lg:text-2xl font-regular">
@@ -132,7 +130,9 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
               </button>
               <button
                 className="cursor-pointer text-white font-medium text-sm lg:text-md py-1 px-4 lg:py-2 bg-pink-500 rounded-3xl"
-                onClick={openModal}
+                onClick={() => {
+                  openModal();
+                }}
               >
                 Edit Playlist Name
               </button>
@@ -144,7 +144,7 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
             Tracks
           </div>
           <div
-            className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer mt-3"
+            className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md py-4 hover:bg-gray-800 cursor-pointer mt-3"
             onClick={() => {
               let trackUriList = [];
               tracksData.forEach((track) => {

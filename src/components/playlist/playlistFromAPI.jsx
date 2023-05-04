@@ -47,9 +47,9 @@ function PlaylistFromAPI({ playlistData, token }) {
             <p className="text-sm text-blue-300 font-bold mb-2 mt-4 lg:mt-0">
               {playlistData.type.toUpperCase()}
             </p>
-            <h1 className="text-3xl lg:text-6xl font-bold mb-2">
+            <div className="text-3xl lg:text-6xl font-bold mb-2">
               {playlistData.name}
-            </h1>
+            </div>
             {playlistData.description && (
               <p className="text-xl font-light text-pink-500 mt-4">
                 {playlistData.description.replace(/<\/?[^>]+(>|$)/g, "")}
@@ -66,7 +66,7 @@ function PlaylistFromAPI({ playlistData, token }) {
             Tracks
           </div>
           <div
-            className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer mt-3"
+            className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md py-4 hover:bg-gray-800 cursor-pointer mt-3"
             onClick={() => handlePlayerAdd(playlistData.uri)}
           >
             Listen Now

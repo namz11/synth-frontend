@@ -9,7 +9,10 @@ import { PlayerContext } from "@context/PlayerContext";
 function TrackListForUserPlaylist({ tracks, playlistId, token }) {
   const [resultModal, setResultModal] = useState(false);
   const [resultResponse, setResultResponse] = useState(false);
+  const [currentTracks, setCurrentTracks] = useState(tracks);
+
   const [deviceId, setDeviceId] = useContext(PlayerContext);
+
   function formatDuration(duration_ms) {
     const seconds = Math.floor((duration_ms / 1000) % 60);
     const minutes = Math.floor(duration_ms / 1000 / 60);
@@ -29,6 +32,9 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
       })
       .then((response) => {
         setResultResponse(response.data.message);
+        setCurrentTracks((prevTracks) =>
+          prevTracks.filter((track) => track.id !== trackId)
+        );
       })
       .catch((error) => {
         console.error(error);
@@ -60,7 +66,7 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
   return (
     <>
       <div className="container mx-auto text-white mt-4">
-        {tracks.map((track, index) => (
+        {currentTracks.map((track, index) => (
           <div
             key={track.id}
             className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer"
@@ -141,7 +147,7 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
           <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
             <div className="text-center">
               <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900">{`Track ${resultResponse}`}</h3>
+                <div className="text-lg font-medium text-gray-900">{`Track ${resultResponse}`}</div>
               </div>
             </div>
 
@@ -151,7 +157,6 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
                 className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-pink-600 rounded-md shadow-sm hover:bg-pink-700 sm:w-auto sm:text-sm"
                 onClick={() => {
                   setResultModal(false);
-                  window.location.reload();
                 }}
               >
                 Close
