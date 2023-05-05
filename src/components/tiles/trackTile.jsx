@@ -65,6 +65,7 @@ const TrackTile = ({ data, token }) => {
               <button
                 onClick={() => handlePlayerAdd([data.uri], token)}
                 type="button"
+                aria-label="Play Song Button"
               >
                 <FaPlay aria-label="Play Song Button" />
               </button>
