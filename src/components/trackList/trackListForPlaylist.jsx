@@ -193,6 +193,7 @@ function TopTrackForPlaylist({ tracks, token }) {
                       ? () => handlePlayerAdd([track.track.uri])
                       : undefined
                   }
+                  aria-label="Play Track"
                 />
               ) : (
                 <span
@@ -277,7 +278,10 @@ function TopTrackForPlaylist({ tracks, token }) {
                   onClick={() => handleAddToPlaylistClick(track.track.id)}
                   title="Add to Playlist"
                 >
-                  <RiPlayListAddLine className="text-xl lg:text-2xl" />
+                  <RiPlayListAddLine
+                    className="text-xl lg:text-2xl"
+                    aria-label="Add To Playlist"
+                  />
                 </div>
               )}
             </div>

@@ -108,6 +108,7 @@ function TrackList({ tracks, token }) {
                 onClick={
                   track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
                 }
+                aria-label="Play Track"
               />
             ) : (
               <span
@@ -158,7 +159,10 @@ function TrackList({ tracks, token }) {
                 className="text-blue-300 z-10 ml-5 cursor-pointer"
                 onClick={() => handleAddToPlaylistClick(track.id)}
               >
-                <RiPlayListAddLine className="text-xl lg:text-2xl" />
+                <RiPlayListAddLine
+                  className="text-xl lg:text-2xl"
+                  aria-label="Add To Playlist Button"
+                />
               </div>
             )}
           </div>

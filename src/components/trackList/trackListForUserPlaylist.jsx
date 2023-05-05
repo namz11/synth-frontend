@@ -82,6 +82,7 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
                 onClick={
                   track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
                 }
+                aria-label="Play Track"
               />
             ) : (
               <span
@@ -156,8 +157,12 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
                 <div
                   className="text-pink-500 z-10 ml-5 cursor-pointer"
                   onClick={() => handleDeleteTrackClick(track.id, token)}
+                  title="Remove From Playlist"
                 >
-                  <MdDelete className="text-xl lg:text-2xl" />
+                  <MdDelete
+                    className="text-xl lg:text-2xl"
+                    aria-label="Remove From Playlist"
+                  />
                 </div>
               )}
             </div>
