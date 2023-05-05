@@ -2,7 +2,8 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useContext } from "react";
-import { RiPlayListAddLine, BsMusicNoteList } from "react-icons/ri";
+import { RiPlayListAddLine } from "react-icons/ri";
+import { BsFillPlayFill } from "react-icons/bs";
 import { spotifyApi } from "react-spotify-web-playback";
 import { PlayerContext } from "@context/PlayerContext";
 
@@ -10,6 +11,8 @@ function TopTrackForPlaylist({ tracks, token }) {
   const [showModal, setShowModal] = useState(false);
   const [selectedTrackId, setSelectedTrackId] = useState(null);
   const [userPlaylists, setUserPlaylists] = useState(null);
+
+  const [hoveredIndex, setHoveredIndex] = useState(-1);
 
   const [resultModal, setResultModal] = useState(false);
   const [resultResponse, setResultResponse] = useState(false);
@@ -180,21 +183,34 @@ function TopTrackForPlaylist({ tracks, token }) {
             <div
               key={track.id}
               className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer"
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(-1)}
             >
-              <span
-                className="mr-5 text-white"
-                onClick={
-                  track.track?.uri
-                    ? () => handlePlayerAdd([track.track.uri])
-                    : undefined
-                }
-              >
-                {index + 1}
-              </span>
+              {hoveredIndex === index ? (
+                <BsFillPlayFill
+                  className="mr-2 text-2xl text-white"
+                  onClick={
+                    track.track?.uri
+                      ? () => handlePlayerAdd([track.track.uri])
+                      : undefined
+                  }
+                />
+              ) : (
+                <span
+                  className="mr-5 text-md lg:text-xl text-white"
+                  onClick={
+                    track.track?.uri
+                      ? () => handlePlayerAdd([track.track.uri])
+                      : undefined
+                  }
+                >
+                  {index + 1}
+                </span>
+              )}
 
               <div className="hidden md:block">
                 <Image
-                  className="object-cover mr-4"
+                  className="object-cover mr-4 "
                   src={
                     track?.track?.album?.images[1]?.url ||
                     "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
@@ -211,14 +227,8 @@ function TopTrackForPlaylist({ tracks, token }) {
               </div>
 
               <div className="flex-grow">
-                {/* <div
-                  className="font-medium text-xl text-white text-overflow:text-ellipsis hover:underline max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch] "
-                  onClick={() => handlePlayerAdd([track.track.uri])}
-                >
-                  {track.track?.name || `No Name Available`}
-                </div> */}
                 <div
-                  className="font-medium text-xl text-white text-overflow:text-ellipsis hover:underline max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch] "
+                  className="font-medium text-xl text-white text-overflow:text-ellipsis hover:underline max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch]"
                   onClick={
                     track.track?.uri
                       ? () => handlePlayerAdd([track.track.uri])
@@ -228,20 +238,6 @@ function TopTrackForPlaylist({ tracks, token }) {
                   {track.track?.name || "Track Unavailable"}
                 </div>
 
-                {/* <div className="text-gray-400 flex flex-wrap">
-                   {track?.track?.artists?.map((artist, index) => (
-                    <React.Fragment key={artist.id}>
-                      <Link href={`/artist/${artist.id}`}>
-                        <div className="text-pink-500 text-lg hover:underline">
-                          {artist.name}
-                        </div>
-                      </Link>
-                      {index !== track.track.artists.length - 1 && (
-                        <span className="text-pink-500">,&nbsp;</span>
-                      )}
-                    </React.Fragment>
-                  ))} 
-                  </div>*/}
                 {track?.track?.artists && track?.track?.artists.length > 0 && (
                   <div className="text-gray-400 flex flex-wrap">
                     {track.track.artists.map((artist, index) => (
@@ -263,7 +259,7 @@ function TopTrackForPlaylist({ tracks, token }) {
               {track?.track?.album?.id && track?.track?.album?.name && (
                 <div className="hidden lg:block">
                   <Link href={`/album/${track.track.album.id}`}>
-                    <div className="text-blue-300 hover:underline mr-28">
+                    <div className="text-blue-300 z-20 hover:underline mr-28">
                       {track.track.album.name}
                     </div>
                   </Link>
@@ -276,9 +272,9 @@ function TopTrackForPlaylist({ tracks, token }) {
                 </div>
               )}
 
-              {track?.track?.id && (
+              {track?.track?.id && track?.track?.name && (
                 <div
-                  className="text-blue-300 z-10 ml-5 cursor-pointer"
+                  className="text-blue-300 ml-5 cursor-pointer"
                   onClick={() => handleAddToPlaylistClick(track.track.id)}
                 >
                   <RiPlayListAddLine className="text-xl lg:text-2xl" />
