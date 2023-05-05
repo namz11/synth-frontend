@@ -279,6 +279,7 @@ function TopTrackForPlaylist({ tracks, token }) {
                 <div
                   className="text-blue-300 z-10 ml-5 cursor-pointer"
                   onClick={() => handleAddToPlaylistClick(track.track.id)}
+                  title="Add to Playlist"
                 >
                   <RiPlayListAddLine className="text-xl lg:text-2xl" />
                 </div>

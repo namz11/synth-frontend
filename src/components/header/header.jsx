@@ -183,6 +183,7 @@ const Header = () => {
               value={searchTerm}
               onChange={(e) => handleSearchChange(e)}
               onClick={() => router.push("/search")} // Add this line
+              aria-label="Search"
             />
           </div>
 
