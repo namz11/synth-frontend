@@ -218,7 +218,7 @@ const Header = () => {
                 <img
                   src={photoURL || "/user.png"}
                   className="object-cover w-full h-full"
-                  alt="avatar"
+                  alt="Profile avatar and page button"
                 />
               </div>
             </button>
@@ -357,7 +357,7 @@ const Header = () => {
                 <img
                   src={photoURL || "/user.png"}
                   className="object-cover w-full h-full"
-                  alt="avatar"
+                  alt="Profile avatar and page button"
                 />
               </div>
             </button>
