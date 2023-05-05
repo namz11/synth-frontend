@@ -30,8 +30,6 @@ function Artist({ artistData, artistTopTracksData, token }) {
     });
   }
 
-  console.log(artistTopTracksData);
-
   return (
     <>
       <div className="mt-2 lg:mt-6 flex flex-col ">
@@ -39,7 +37,7 @@ function Artist({ artistData, artistTopTracksData, token }) {
           <div className="w-3/10 flex items-center justify-center px-4">
             <Image
               src={
-                artistData.images[0].url ||
+                artistData?.images[0]?.url ||
                 "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
               }
               alt="Artist Cover"
@@ -49,10 +47,10 @@ function Artist({ artistData, artistTopTracksData, token }) {
           </div>
           <div className="w-7/10 pl-4 flex flex-col items-start justify-center text-white">
             <div className="text-sm text-blue-300 font-bold mb-2 mt-4 lg:mt-0">
-              {artistData.type.toUpperCase()}
+              {artistData?.type.toUpperCase() || `ARTIST`}
             </div>
             <div className="text-3xl lg:text-7xl font-bold mb-2">
-              {artistData.name}
+              {artistData?.name || `No Name Available`}
             </div>
           </div>
         </div>
@@ -61,7 +59,7 @@ function Artist({ artistData, artistTopTracksData, token }) {
             Top Tracks
           </div>
           <div
-            className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer mt-3"
+            className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md py-4 hover:bg-gray-800 cursor-pointer mt-3"
             onClick={() => {
               let trackUriList = [];
               artistTopTracksData.tracks.forEach((track) => {
