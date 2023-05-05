@@ -5,11 +5,14 @@ import React, { useState, useContext } from "react";
 import { MdDelete } from "react-icons/md";
 import { spotifyApi } from "react-spotify-web-playback";
 import { PlayerContext } from "@context/PlayerContext";
+import { BsFillPlayFill } from "react-icons/bs";
 
 function TrackListForUserPlaylist({ tracks, playlistId, token }) {
   const [resultModal, setResultModal] = useState(false);
   const [resultResponse, setResultResponse] = useState(false);
   const [currentTracks, setCurrentTracks] = useState(tracks);
+
+  const [hoveredIndex, setHoveredIndex] = useState(-1);
 
   const [deviceId, setDeviceId] = useContext(PlayerContext);
 
@@ -70,16 +73,26 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
           <div
             key={track.id}
             className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer"
+            onMouseEnter={() => setHoveredIndex(index)}
+            onMouseLeave={() => setHoveredIndex(-1)}
           >
-            <span
-              className="mr-5 text-white"
-              onClick={
-                track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
-              }
-            >
-              {index + 1}
-            </span>
-
+            {hoveredIndex === index ? (
+              <BsFillPlayFill
+                className="mr-2 text-2xl text-white"
+                onClick={
+                  track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
+                }
+              />
+            ) : (
+              <span
+                className="mr-5 text-md lg:text-xl text-white"
+                onClick={
+                  track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
+                }
+              >
+                {index + 1}
+              </span>
+            )}
             <div className="hidden md:block">
               <Image
                 className="object-cover mr-4"
