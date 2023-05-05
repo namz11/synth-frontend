@@ -143,18 +143,21 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
           <div className="text-3xl text-white font-semibold px-4 lg:px-0">
             Tracks
           </div>
-          <div
-            className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md py-4 hover:bg-gray-800 cursor-pointer mt-3"
-            onClick={() => {
-              let trackUriList = [];
-              tracksData.forEach((track) => {
-                trackUriList.push(track.uri);
-              });
-              handlePlayerAdd(trackUriList);
-            }}
-          >
-            Listen Now
-          </div>
+          {/* If playlist length is equal to zero, don't render */}
+          {tracksData.length !== 0 && (
+            <div
+              className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md py-4 hover:bg-gray-800 cursor-pointer mt-3"
+              onClick={() => {
+                let trackUriList = [];
+                tracksData.forEach((track) => {
+                  trackUriList.push(track.uri);
+                });
+                handlePlayerAdd(trackUriList);
+              }}
+            >
+              Listen Now
+            </div>
+          )}
           <TrackListForPlaylist
             tracks={tracksData}
             playlistId={playlistId}
