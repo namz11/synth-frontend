@@ -193,7 +193,7 @@ const Header = () => {
               aria-label="show notifications"
               onClick={handleLogout}
             >
-              <FiLogOut />
+              <FiLogOut aria-label="Logout" />
             </button>
 
             <button
