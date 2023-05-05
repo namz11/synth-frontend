@@ -116,20 +116,20 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
               {newName || playlistData.data.name}
             </p>
             {playlistData.data.tracks !== [] && playlistData.data.userId && (
-              <p className="text-pink-500 text-lg lg:text-2xl font-regular">
+              <p className="text-pink-600 text-lg lg:text-2xl font-regular">
                 {/* {playlistData.data.userId.toUpperCase()} &bull;{" "} */}
                 {playlistData.data.tracks.length} Tracks
               </p>
             )}
             <div className="flex gap-4 mt-2">
               <button
-                className="cursor-pointer text-white font-medium text-sm lg:text-md py-1 px-4 lg:py-2 bg-pink-500 rounded-3xl"
+                className="cursor-pointer text-white font-medium text-sm lg:text-md py-1 px-4 lg:py-2 bg-pink-600 rounded-3xl"
                 onClick={() => handleDeletePlaylist()}
               >
                 Delete Playlist
               </button>
               <button
-                className="cursor-pointer text-white font-medium text-sm lg:text-md py-1 px-4 lg:py-2 bg-pink-500 rounded-3xl"
+                className="cursor-pointer text-white font-medium text-sm lg:text-md py-1 px-4 lg:py-2 bg-pink-600 rounded-3xl"
                 onClick={() => {
                   openModal();
                 }}
