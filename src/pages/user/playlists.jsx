@@ -137,7 +137,7 @@ const MyPlaylists = () => {
                     <div>
                       <div className="text-center">
                         <Dialog.Title
-                          as="h3"
+                          as="h1"
                           className="text-base font-semibold leading-6 text-gray-100"
                         >
                           Create a playlist

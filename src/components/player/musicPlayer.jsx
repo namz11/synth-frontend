@@ -111,7 +111,6 @@ function MusicPlayer() {
           getOAuthToken={async (cb) => {
             // fetch token from backend api
             let tok = await refetchToken();
-            console.log("fetched new token");
             cb(tok);
           }}
         ></SpotifyPlayer>

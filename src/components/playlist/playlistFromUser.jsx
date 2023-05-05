@@ -118,7 +118,11 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
             {playlistData.data.tracks !== [] && playlistData.data.userId && (
               <p className="text-pink-600 text-lg lg:text-2xl font-regular">
                 {/* {playlistData.data.userId.toUpperCase()} &bull;{" "} */}
-                {playlistData.data.tracks.length} Tracks
+                {playlistData.data.tracks.length === 1 ? (
+                  <span>{`${playlistData.data.tracks.length} Track`}</span>
+                ) : (
+                  <span>{`${playlistData.data.tracks.length} Tracks`}</span>
+                )}
               </p>
             )}
             <div className="flex gap-4 mt-2">
