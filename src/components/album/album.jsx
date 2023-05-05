@@ -11,6 +11,7 @@ function Album({ albumData, token }) {
 
   function formatDate(dateStr) {
     const date = new Date(dateStr);
+    date.setDate(date.getDate() + 1);
     const formattedDate = date.toLocaleDateString("en-US", {
       month: "long",
       day: "numeric",
@@ -48,7 +49,7 @@ function Album({ albumData, token }) {
             <div className="w-3/10 flex items-center justify-center px-4">
               <Image
                 src={
-                  albumData.images[0].url ||
+                  albumData?.images[0]?.url ||
                   "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
                 }
                 alt="Album Cover"
@@ -58,13 +59,13 @@ function Album({ albumData, token }) {
             </div>
             <div className="w-7/10 pl-4 flex flex-col items-start justify-center text-white text-overflow: ellipsis">
               <p className="text-sm text-blue-300 font-bold mb-2 mt-4 lg:mt-0">
-                {albumData.type.toUpperCase()}
+                {albumData?.type.toUpperCase() || `ALBUM`}
               </p>
               <p className="text-3xl lg:text-5xl font-bold mb-2">
-                {albumData.name}
+                {albumData?.name || `No Name Available`}
               </p>
               <div className="text-lg lg:text-xl font-semibold mb-2 ">
-                {albumData.artists.map((artist, index) => (
+                {albumData?.artists?.map((artist, index) => (
                   <React.Fragment key={artist.id}>
                     <Link href={`/artist/${artist.id}`}>
                       <span className="text-pink-500 hover:text-pink-600">
@@ -77,10 +78,17 @@ function Album({ albumData, token }) {
                   </React.Fragment>
                 ))}
               </div>
-              <p className="text-blue-300 font-medium">
-                {albumData.total_tracks} Tracks &bull;{" "}
-                {albumData.release_date.slice(0, 4)}
-              </p>
+              {/* <p className="text-blue-300 font-medium">
+                {albumData?.total_tracks} Tracks &bull;{" "}
+                {albumData?.release_date.slice(0, 4)}
+              </p> */}
+              {albumData && (
+                <p className="text-blue-300 font-medium">
+                  {albumData.total_tracks && `${albumData.total_tracks} Tracks`}{" "}
+                  {albumData.release_date &&
+                    `• ${albumData.release_date.slice(0, 4)}`}
+                </p>
+              )}
             </div>
           </div>
 
@@ -94,20 +102,17 @@ function Album({ albumData, token }) {
             >
               Listen Now
             </div>
-            <TrackList
-              tracks={albumData.tracks}
-              imagesData={albumData.images}
-              token={token}
-            />
+            <TrackList tracks={albumData.tracks} token={token} />
             <div className="my-8 text-gray-400 text-sm">
-              <p>{formatDate(albumData.release_date)}</p>
-              {albumData?.copyrights &&
-                albumData?.copyrights.map((item) => (
-                  <p key={item.type}>
-                    {item.type === "C" && `© ${item.text.slice(3)}`}
-                    {item.type === "P" && `℗ ${item.text.slice(3)}`}
-                  </p>
-                ))}
+              {albumData?.release_date && (
+                <p>{formatDate(albumData.release_date)}</p>
+              )}
+              {albumData?.copyrights?.map((item) => (
+                <p key={item.type}>
+                  {item.type === "C" && `© ${item.text.slice(3)}`}
+                  {item.type === "P" && `℗ ${item.text.slice(3)}`}
+                </p>
+              ))}
             </div>
           </div>
         </div>

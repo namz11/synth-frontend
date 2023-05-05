@@ -35,7 +35,7 @@ function PlaylistFromAPI({ playlistData, token }) {
           <div className="w-3/10 flex items-center justify-center px-4">
             <Image
               src={
-                playlistData.images[0].url ||
+                playlistData?.images[0]?.url ||
                 "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
               }
               alt="Artist Cover"
@@ -45,20 +45,32 @@ function PlaylistFromAPI({ playlistData, token }) {
           </div>
           <div className="w-7/10 pl-4 flex flex-col items-start justify-center text-white text-overflow: ellipsis">
             <p className="text-sm text-blue-300 font-bold mb-2 mt-4 lg:mt-0">
-              {playlistData.type.toUpperCase()}
+              {playlistData?.type.toUpperCase() || "PLAYLIST"}
             </p>
             <div className="text-3xl lg:text-6xl font-bold mb-2">
-              {playlistData.name}
+              {playlistData?.name || `No Name Available`}
             </div>
             {playlistData.description && (
               <p className="text-xl font-light text-pink-500 mt-4">
                 {playlistData.description.replace(/<\/?[^>]+(>|$)/g, "")}
               </p>
             )}
-            <p className="text-pink-500 mt-4 text-2xl font-regular">
+            {/* <p className="text-pink-500 mt-4 text-2xl font-regular">
               {playlistData.owner.display_name} &bull;{" "}
               {playlistData.tracks.total} Tracks
-            </p>
+            </p> */}
+            {playlistData && (
+              <p className="text-pink-500 mt-4 text-2xl font-regular">
+                {playlistData.owner && playlistData.owner.display_name && (
+                  <>
+                    {playlistData.owner.display_name} &bull;{" "}
+                    {playlistData.tracks && playlistData.tracks.total && (
+                      <>{playlistData.tracks.total} Tracks</>
+                    )}
+                  </>
+                )}
+              </p>
+            )}
           </div>
         </div>
         <div className="h-3/4 container mx-auto my-8">

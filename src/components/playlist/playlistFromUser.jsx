@@ -117,7 +117,7 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
             </p>
             {playlistData.data.tracks !== [] && playlistData.data.userId && (
               <p className="text-pink-500 text-lg lg:text-2xl font-regular">
-                {playlistData.data.userId.toUpperCase()} &bull;{" "}
+                {/* {playlistData.data.userId.toUpperCase()} &bull;{" "} */}
                 {playlistData.data.tracks.length} Tracks
               </p>
             )}

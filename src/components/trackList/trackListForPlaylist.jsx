@@ -41,7 +41,7 @@ function TopTrackForPlaylist({ tracks, token }) {
     setShowModal(true);
   }
 
-  function handlePlaylistSelect(playlistId, trackImages) {
+  function handlePlaylistSelect(playlistId) {
     if (selectedTrackId && playlistId) {
       const url = `/api/user/playlists/${playlistId}/tracks`;
       axios
@@ -51,7 +51,6 @@ function TopTrackForPlaylist({ tracks, token }) {
             tracks: [
               {
                 id: selectedTrackId,
-                images: imagesForTracks,
               },
             ],
           },
@@ -177,72 +176,60 @@ function TopTrackForPlaylist({ tracks, token }) {
 
       <div className="container mx-auto text-white mt-4">
         {tracks.map((track, index) => {
-          if (
-            !track ||
-            !track.track ||
-            !track.track.album ||
-            !track.track.album.images ||
-            !track.track.name
-          ) {
-            return (
-              <div
-                key={track.id}
-                className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer"
-              >
-                <div className="mr-5 text-white">{index + 1}</div>
-
-                <div className="hidden md:block">
-                  <Image
-                    className="object-cover mr-4"
-                    src={
-                      "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
-                    }
-                    alt="Track Cover"
-                    width={70}
-                    height={70}
-                  />
-                </div>
-
-                <div className="flex-grow">
-                  <div className="font-medium text-xl text-white text-overflow:text-ellipsis max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch] ">
-                    {`Track Unavailable`}
-                  </div>
-                </div>
-              </div>
-            );
-          }
           return (
             <div
               key={track.id}
               className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer"
             >
-              <Link href={`#_`}>
-                <div className="mr-5 text-white">{index + 1}</div>
-              </Link>
+              <span
+                className="mr-5 text-white"
+                onClick={
+                  track.track?.uri
+                    ? () => handlePlayerAdd([track.track.uri])
+                    : undefined
+                }
+              >
+                {index + 1}
+              </span>
 
               <div className="hidden md:block">
-                <Link href={`#_`}>
-                  <Image
-                    className="object-cover mr-4"
-                    src={
-                      track.track.album.images[1]?.url ||
-                      "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
-                    }
-                    alt="Track Cover"
-                    width={70}
-                    height={70}
-                  />
-                </Link>
+                <Image
+                  className="object-cover mr-4"
+                  src={
+                    track?.track?.album?.images[1]?.url ||
+                    "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
+                  }
+                  alt="Track Cover"
+                  width={70}
+                  height={70}
+                  onClick={
+                    track.track?.uri
+                      ? () => handlePlayerAdd([track.track.uri])
+                      : undefined
+                  }
+                />
               </div>
 
               <div className="flex-grow">
-                <Link href={`#_`}>
-                  <div className="font-medium text-xl text-white text-overflow:text-ellipsis hover:underline max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch] ">
-                    {track.track.name}
-                  </div>
-                </Link>
-                <div className="text-gray-400 flex flex-wrap">
-                  {track.track.artists.map((artist, index) => (
+                {/* <div
+                  className="font-medium text-xl text-white text-overflow:text-ellipsis hover:underline max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch] "
+                  onClick={() => handlePlayerAdd([track.track.uri])}
+                >
+                  {track.track?.name || `No Name Available`}
+                </div> */}
+                <div
+                  className="font-medium text-xl text-white text-overflow:text-ellipsis hover:underline max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch] "
+                  onClick={
+                    track.track?.uri
+                      ? () => handlePlayerAdd([track.track.uri])
+                      : undefined
+                  }
+                >
+                  {track.track?.name || "Track Unavailable"}
+                </div>
+
+                {/* <div className="text-gray-400 flex flex-wrap">
+                   {track?.track?.artists?.map((artist, index) => (
                     <React.Fragment key={artist.id}>
                       <Link href={`/artist/${artist.id}`}>
                         <div className="text-pink-500 text-lg hover:underline">
@@ -253,38 +240,50 @@ function TopTrackForPlaylist({ tracks, token }) {
                         <span className="text-pink-500">,&nbsp;</span>
                       )}
                     </React.Fragment>
-                  ))}
-                </div>
-              </div>
-
-              <div className="hidden lg:block">
-                <Link href={`/album/${track.track.album.id}`}>
-                  <div className="text-blue-300 hover:underline mr-28">
-                    {track.track.album.name}
+                  ))} 
+                  </div>*/}
+                {track?.track?.artists && track?.track?.artists.length > 0 && (
+                  <div className="text-gray-400 flex flex-wrap">
+                    {track.track.artists.map((artist, index) => (
+                      <React.Fragment key={artist.id}>
+                        <Link href={`/artist/${artist.id}`}>
+                          <div className="text-pink-500 text-lg hover:underline">
+                            {artist.name}
+                          </div>
+                        </Link>
+                        {index !== track.track.artists.length - 1 && (
+                          <span className="text-pink-500">,&nbsp;</span>
+                        )}
+                      </React.Fragment>
+                    ))}
                   </div>
-                </Link>
+                )}
               </div>
 
-              <div className="text-gray-400">
-                {formatDuration(track.track.duration_ms)}
-              </div>
-              <div
-                className="text-gray-400 ml-5"
-                onClick={() => handlePlayerAdd([track.track.uri])}
-              >
-                Listen to this song!
-              </div>
-              <div
-                className="text-blue-300 z-10 ml-5 cursor-pointer"
-                onClick={() =>
-                  handleAddToPlaylistClick(
-                    track.track.id,
-                    track.track.album.images
-                  )
-                }
-              >
-                <RiPlayListAddLine className="text-xl lg:text-2xl" />
-              </div>
+              {track?.track?.album?.id && track?.track?.album?.name && (
+                <div className="hidden lg:block">
+                  <Link href={`/album/${track.track.album.id}`}>
+                    <div className="text-blue-300 hover:underline mr-28">
+                      {track.track.album.name}
+                    </div>
+                  </Link>
+                </div>
+              )}
+
+              {track?.track?.duration_ms && (
+                <div className="text-gray-400">
+                  {formatDuration(track.track.duration_ms)}
+                </div>
+              )}
+
+              {track?.track?.id && (
+                <div
+                  className="text-blue-300 z-10 ml-5 cursor-pointer"
+                  onClick={() => handleAddToPlaylistClick(track.track.id)}
+                >
+                  <RiPlayListAddLine className="text-xl lg:text-2xl" />
+                </div>
+              )}
             </div>
           );
         })}

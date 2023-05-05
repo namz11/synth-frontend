@@ -5,7 +5,7 @@ import { RiPlayListAddLine } from "react-icons/ri";
 import { spotifyApi } from "react-spotify-web-playback";
 import { PlayerContext } from "@context/PlayerContext";
 
-function TrackList({ tracks, imagesData, token }) {
+function TrackList({ tracks, token }) {
   const [showModal, setShowModal] = useState(false);
   const [resultModal, setResultModal] = useState(false);
   const [resultResponse, setResultResponse] = useState(false);
@@ -46,7 +46,6 @@ function TrackList({ tracks, imagesData, token }) {
             tracks: [
               {
                 id: selectedTrackId,
-                images: imagesData,
               },
             ],
           },
@@ -92,51 +91,61 @@ function TrackList({ tracks, imagesData, token }) {
   return (
     <>
       <div className="container mx-auto text-white mt-4">
-        {tracks.items.map((track) => (
+        {tracks.items.map((track, index) => (
           <div
             key={track.id}
             className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer"
           >
-            <Link href={`#_`}>
-              <div className="mr-5 text-white">{track.track_number}</div>
-            </Link>
+            <div
+              className="mr-5 text-white"
+              onClick={
+                track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
+              }
+            >
+              {index + 1}
+            </div>
+
             <div className="flex-grow">
-              <Link href={`#_`}>
-                <div className="font-medium text-xl text-white text-overflow:text-ellipsis hover:underline max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch] ">
-                  {track.name}
-                </div>
-              </Link>
+              <div
+                className="font-medium text-xl text-white text-overflow:text-ellipsis hover:underline max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch]"
+                onClick={
+                  track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
+                }
+              >
+                {track?.name || "Track Unavailable"}
+              </div>
 
               <div className="text-gray-400 flex flex-wrap">
-                {track.artists.map((artist, index) => (
-                  <React.Fragment key={artist.id}>
-                    <Link href={`/artist/${artist.id}`}>
-                      <div className="text-pink-500 text-lg hover:underline">
-                        {artist.name}
-                      </div>
-                    </Link>
-                    {index !== track.artists.length - 1 && (
-                      <span className="text-pink-500">,&nbsp;</span>
-                    )}
-                  </React.Fragment>
-                ))}
+                {track.artists && track.artists.length > 0 && (
+                  <>
+                    {track.artists.map((artist, index) => (
+                      <React.Fragment key={artist.id}>
+                        <Link href={`/artist/${artist.id}`}>
+                          <div className="text-pink-500 text-lg hover:underline">
+                            {artist.name}
+                          </div>
+                        </Link>
+                        {index !== track.artists.length - 1 && (
+                          <span className="text-pink-500">,&nbsp;</span>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </>
+                )}
               </div>
             </div>
             <div className="text-gray-400">
-              {formatDuration(track.duration_ms)}
+              {track.duration_ms ? formatDuration(track.duration_ms) : ""}
             </div>
-            <div
-              className="text-gray-400 ml-5"
-              onClick={() => handlePlayerAdd([track.uri])}
-            >
-              Listen to this song!
-            </div>
-            <div
-              className="text-blue-300 z-10 ml-5 cursor-pointer"
-              onClick={() => handleAddToPlaylistClick(track.id)}
-            >
-              <RiPlayListAddLine className="text-xl lg:text-2xl" />
-            </div>
+
+            {track.id && (
+              <div
+                className="text-blue-300 z-10 ml-5 cursor-pointer"
+                onClick={() => handleAddToPlaylistClick(track.id)}
+              >
+                <RiPlayListAddLine className="text-xl lg:text-2xl" />
+              </div>
+            )}
           </div>
         ))}
       </div>

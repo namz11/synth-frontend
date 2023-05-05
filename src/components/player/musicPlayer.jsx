@@ -55,7 +55,7 @@ function MusicPlayer() {
 
   return (
     user && (
-      <div className="fixed bottom-0 w-full">
+      <div className="fixed bottom-0 z-40 w-full">
         <SpotifyPlayer
           name="Synth Music Player"
           token={token}

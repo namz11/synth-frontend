@@ -71,68 +71,82 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
             key={track.id}
             className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer"
           >
-            <Link href={`#_`}>
-              <span className="mr-5 text-white">{index + 1}</span>
-            </Link>
+            <span
+              className="mr-5 text-white"
+              onClick={
+                track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
+              }
+            >
+              {index + 1}
+            </span>
+
             <div className="hidden md:block">
-              <Link href={`#_`}>
-                <Image
-                  className="object-cover mr-4"
-                  src={
-                    track.album.images[1].url ||
-                    "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
-                  }
-                  alt="Track Cover"
-                  width={70}
-                  height={70}
-                />
-              </Link>
+              <Image
+                className="object-cover mr-4"
+                src={
+                  track.album.images[1]?.url ||
+                  "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
+                }
+                alt="Track Cover"
+                width={70}
+                height={70}
+                onClick={
+                  track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
+                }
+              />
             </div>
 
             <div className="flex-grow">
-              <Link href={`#_`}>
-                <div className="font-medium text-xl text-white text-overflow:text-ellipsis hover:underline max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch] ">
-                  {track.name}
-                </div>
-              </Link>
-              <div className="text-gray-400 flex flex-wrap">
-                {track.artists.map((artist, index) => (
-                  <React.Fragment key={artist.id}>
-                    <Link href={`/artist/${artist.id}`}>
-                      <div className="text-pink-500 hover:underline">
-                        {artist.name}
-                      </div>
-                    </Link>
-                    {index !== track.artists.length - 1 && (
-                      <span className="text-pink-500">,&nbsp;</span>
-                    )}
-                  </React.Fragment>
-                ))}
+              <div
+                className="font-medium text-xl text-white text-overflow:text-ellipsis hover:underline max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch] "
+                onClick={
+                  track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
+                }
+              >
+                {track.name || "Track Unavailable"}
               </div>
+
+              {track.artists && track.artists.length > 0 && (
+                <div className="text-gray-400 flex flex-wrap">
+                  {track.artists.map((artist, index) => (
+                    <React.Fragment key={artist.id}>
+                      <Link href={`/artist/${artist.id}`}>
+                        <div className="text-pink-500 hover:underline">
+                          {artist.name || "Artist Unavailable"}
+                        </div>
+                      </Link>
+                      {index !== track.artists.length - 1 && (
+                        <span className="text-pink-500">,&nbsp;</span>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div className="hidden lg:block">
-              <Link href={`/album/${track.album.id}`}>
-                <div className="text-blue-300 hover:underline mr-28">
-                  {track.album.name}
-                </div>
-              </Link>
-            </div>
+            {track.album.id && track.album.name && (
+              <div className="hidden lg:block">
+                <Link href={`/album/${track.album.id}`}>
+                  <div className="text-blue-300 hover:underline mr-28">
+                    {track.album.name}
+                  </div>
+                </Link>
+              </div>
+            )}
 
             <div className="text-gray-400">
-              {formatDuration(track.duration_ms)}
+              {track.duration_ms ? formatDuration(track.duration_ms) : " "}
             </div>
-            <div
-              className="text-gray-400 ml-5"
-              onClick={() => handlePlayerAdd([track.uri])}
-            >
-              Listen to this song!
-            </div>
-            <div
-              className="text-pink-500 z-10 ml-5 cursor-pointer"
-              onClick={() => handleDeleteTrackClick(track.id, token)}
-            >
-              <MdDelete className="text-xl lg:text-2xl" />
+
+            <div className="text-pink-500 z-10 ml-5 cursor-pointer">
+              {track.id && token && (
+                <div
+                  className="text-pink-500 z-10 ml-5 cursor-pointer"
+                  onClick={() => handleDeleteTrackClick(track.id, token)}
+                >
+                  <MdDelete className="text-xl lg:text-2xl" />
+                </div>
+              )}
             </div>
           </div>
         ))}
