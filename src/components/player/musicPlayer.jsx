@@ -48,6 +48,7 @@ function MusicPlayer() {
       console.error(e);
     }
     tok = res.data.token;
+    setToken(tok);
     return tok;
   };
 
