@@ -162,6 +162,7 @@ function TrackList({ tracks, token }) {
                 <RiPlayListAddLine
                   className="text-xl lg:text-2xl"
                   aria-label="Add To Playlist Button"
+                  title="Add To Playlist"
                 />
               </div>
             )}

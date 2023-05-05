@@ -116,7 +116,7 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
               {newName || playlistData.data.name}
             </p>
             {playlistData.data.tracks !== [] && playlistData.data.userId && (
-              <p className="text-pink-600 text-lg lg:text-2xl font-regular">
+              <p className="text-pink-500 text-lg lg:text-2xl font-regular">
                 {/* {playlistData.data.userId.toUpperCase()} &bull;{" "} */}
                 {playlistData.data.tracks.length === 1 ? (
                   <span>{`${playlistData.data.tracks.length} Track`}</span>
@@ -221,20 +221,32 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
             </div>
 
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full sm:max-w-md">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <div
+                className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4"
+                aria-label="Edit Playlist Name Popup"
+              >
+                <div
+                  className="sm:flex sm:items-start"
+                  aria-label="Edit Playlist Name Popup"
+                >
+                  <div
+                    className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left"
+                    aria-label="Edit Playlist Name Popup"
+                  >
                     <div
                       className="text-lg leading-6 font-medium text-gray-900"
                       id="modal-title"
                     >
-                      <input
-                        type="text"
-                        className="mt-4 p-2 border border-gray-300 rounded-md w-full"
-                        placeholder="Playlist Name..."
-                        value={newName}
-                        onChange={(e) => setNewName(e.target.value)}
-                      />
+                      <label>
+                        <input
+                          type="text"
+                          className="mt-4 p-2 border border-gray-300 rounded-md w-full"
+                          placeholder="Playlist Name..."
+                          value={newName}
+                          onChange={(e) => setNewName(e.target.value)}
+                          aria-label="New Playlist Name Input"
+                        />
+                      </label>
                     </div>
                   </div>
                 </div>
