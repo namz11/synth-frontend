@@ -40,6 +40,7 @@ const Profile = () => {
   const [lastnameError, setLastnameError] = useState(false);
   const [firstnameError, setFirstnameError] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [photoFile, setPhotoFile] = useState(null);
 
   const uploadProfileImage = async (file, userUid) => {
     const storage = getStorage();
@@ -65,6 +66,7 @@ const Profile = () => {
   const handlePhotoChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setPhoto(e.target.files[0]);
+      setPhotoFile(URL.createObjectURL(e.target.files[0]));
       setPhotoChanged(true);
     }
   };
@@ -105,6 +107,14 @@ const Profile = () => {
     fetchUserData();
   }, [router, user]);
 
+  useEffect(() => {
+    return () => {
+      if (photo && photoChanged) {
+        URL.revokeObjectURL(photoFile);
+      }
+    };
+  }, [photoFile, photoChanged]);
+
   const handleEditClick = () => {
     setEditing(true);
     console.log(photo);
@@ -133,6 +143,7 @@ const Profile = () => {
       updatedPhotoURL = await uploadProfileImage(photo, user.uid);
       await updateProfile(user, { photoURL: updatedPhotoURL });
       setPhoto(updatedPhotoURL);
+      setPhotoFile(updatedPhotoURL);
     } else {
       user.photoURL;
     }
@@ -147,7 +158,7 @@ const Profile = () => {
       });
 
       // Image Error Management
-      if (photo) {
+      if (photo && photoChanged) {
         try {
           const imageTest = validateImageInput(photo);
         } catch (e) {
@@ -211,7 +222,11 @@ const Profile = () => {
         <div className="max-w-xl lg:max-w-3xl mx-auto py-8">
           <img
             className="w-24 h-24 mb-6 mx-auto rounded-full object-cover"
-            src={user ? photo || user.photoURL || "/user.png" : "/user.png"}
+            src={
+              user
+                ? photoFile || photo || user.photoURL || "/user.png"
+                : "/user.png"
+            }
             alt="User Avatar"
           />
           {editing ? (
@@ -308,10 +323,6 @@ const Profile = () => {
                   </div>
                 </>
               )}
-              {/* {passwordError && (
-                <div className="text-red-500 mt-2">{passwordError}</div>
-              )} */}
-              {/* <br /> */}
               {passwordError && <p style={{ color: "red" }}>{passwordError}</p>}
               <button
                 onClick={handleSaveClick}
