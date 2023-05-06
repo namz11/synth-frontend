@@ -144,7 +144,10 @@ const MyPlaylists = () => {
                         </Dialog.Title>
                         <div className="mt-2">
                           <div>
-                            <label htmlFor="name" className="sr-only">
+                            <label
+                              htmlFor="name"
+                              className="sr-only text-gray-200"
+                            >
                               Name
                             </label>
                             <input

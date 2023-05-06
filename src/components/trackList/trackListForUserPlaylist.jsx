@@ -68,7 +68,7 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
 
   return (
     <>
-      <div className="container mx-auto text-white mt-4">
+      <div className="container mx-auto text-white mt-4 mb-6">
         {currentTracks.map((track, index) => (
           <div
             key={track.id}
@@ -120,17 +120,21 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
                 {track.name || "Track Unavailable"}
               </div>
 
-              {track.artists && track.artists.length > 0 && (
+              {track?.artists && track?.artists?.length >= 1 && (
                 <div className="text-gray-400 flex flex-wrap">
                   {track.artists.map((artist, index) => (
-                    <React.Fragment key={artist.id}>
-                      <Link href={`/artist/${artist.id}`}>
-                        <div className="text-pink-500 hover:underline">
-                          {artist.name || "Artist Unavailable"}
-                        </div>
-                      </Link>
-                      {index !== track.artists.length - 1 && (
-                        <span className="text-pink-500">,&nbsp;</span>
+                    <React.Fragment key={artist?.id}>
+                      {artist?.id && artist?.name && (
+                        <>
+                          {index > 0 && (
+                            <span className="text-pink-500">,&nbsp;</span>
+                          )}
+                          <Link href={`/artist/${artist.id}`}>
+                            <div className="text-pink-500 text-lg hover:underline">
+                              {artist.name}
+                            </div>
+                          </Link>
+                        </>
                       )}
                     </React.Fragment>
                   ))}
