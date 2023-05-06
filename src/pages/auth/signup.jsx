@@ -190,6 +190,7 @@ function SignUp() {
             email,
             photoURL,
             emailVerified: false,
+            recentTracks: [],
           });
           console.log("The above code got fired?");
         } catch (error) {
