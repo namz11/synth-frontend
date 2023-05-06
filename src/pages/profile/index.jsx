@@ -212,7 +212,7 @@ const Profile = () => {
           <img
             className="w-24 h-24 mb-6 mx-auto rounded-full object-cover"
             src={user ? photo || user.photoURL || "/user.png" : "/user.png"}
-            alt="User"
+            alt="User Avatar"
           />
           {editing ? (
             <>
@@ -322,9 +322,9 @@ const Profile = () => {
             </>
           ) : (
             <>
-              <h3 className="text-white text-xl font-bold mb-6">
+              <h1 className="text-white text-xl font-bold mb-6">
                 Email: {email}
-              </h3>
+              </h1>
               <button
                 onClick={handleEditClick}
                 className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded transition hover:bg-blue-500 focus:outline-none focus:ring"
@@ -335,7 +335,7 @@ const Profile = () => {
               <div className="flex items-center mt-4 lg:mt-0">
                 <button
                   className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded transition hover:bg-blue-500 focus:outline-none focus:ring"
-                  aria-label="show notifications"
+                  aria-label="Logout"
                   onClick={handleLogout}
                 >
                   Logout

@@ -89,7 +89,6 @@ function TopTrackForPlaylist({ tracks, token }) {
     spotifyToken = spotifyToken.data.token;
 
     // Get the device id of the spotify player from context.
-    console.log(trackUriList);
     await spotifyApi.play(spotifyToken, {
       uris: trackUriList,
       deviceId: deviceId,
@@ -194,6 +193,7 @@ function TopTrackForPlaylist({ tracks, token }) {
                       ? () => handlePlayerAdd([track.track.uri])
                       : undefined
                   }
+                  aria-label="Play Track"
                 />
               ) : (
                 <span
@@ -276,8 +276,12 @@ function TopTrackForPlaylist({ tracks, token }) {
                 <div
                   className="text-blue-300 ml-5 cursor-pointer"
                   onClick={() => handleAddToPlaylistClick(track.track.id)}
+                  title="Add to Playlist"
                 >
-                  <RiPlayListAddLine className="text-xl lg:text-2xl" />
+                  <RiPlayListAddLine
+                    className="text-xl lg:text-2xl"
+                    aria-label="Add To Playlist"
+                  />
                 </div>
               )}
             </div>
