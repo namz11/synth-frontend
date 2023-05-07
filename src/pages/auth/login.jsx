@@ -13,6 +13,7 @@ import {
   onAuthStateChanged,
   sendEmailVerification,
   signOut,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import Image from "next/image";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -114,19 +115,64 @@ function LogIn() {
   const [verificationModal, setVerificationModal] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [loginModal, setLoginModal] = useState(false);
+  const [forgotPasswordError, setForgotPasswordError] = useState(false);
+  const [forgotPasswordModal, setForgotPasswordModal] = useState(false);
 
   const resendVerificationEmail = async () => {
     try {
       const userCredential = await signIn(auth, email, password);
       const user = userCredential.user;
-
       if (!user.emailVerified) {
         await sendEmailVerification(user);
-        setError("Verification email resent. Please check your inbox.");
       }
     } catch (error) {
-      const errorMessage = error.message;
+      const errorMessage = error.code;
+      switch (errorMessage) {
+        case "auth/too-many-requests":
+          setVerificationError(
+            "Too many requests. Please try again after some time."
+          );
+          break;
+        case "auth/network-request-failed":
+          setVerificationError(
+            "A network error has occurred. Please check your connection and try again."
+          );
+          break;
+        default:
+          setVerificationError(
+            "An unknown error occurred while sending the verification email."
+          );
+      }
+      setVerificationModal(true);
       console.log(errorMessage);
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      setForgotPasswordError("Please enter an email address.");
+      setForgotPasswordModal(true);
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setForgotPasswordError(
+        "If your email is registered with us, you'll receive a password reset email shortly. Please check your inbox or spam in case you didn't already receive it."
+      );
+      setForgotPasswordModal(true);
+    } catch (error) {
+      console.error("Error sending password reset email: ", error);
+      if (error.code === "auth/user-not-found") {
+        console.error("Error sending password reset email: ", error);
+        setForgotPasswordError("The email address does not exist.");
+        setForgotPasswordModal(true);
+      } else {
+        setForgotPasswordError(
+          "If your email is registered with us, you'll receive a password reset email shortly. Please check your inbox or spam in case you didn't already receive it."
+        );
+        setForgotPasswordModal(true);
+      }
     }
   };
 
@@ -264,12 +310,20 @@ function LogIn() {
                     />
                   </div>
 
-                  <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                    <button className="inline-block shrink-0 rounded-md border border-pink-600 bg-pink-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-pink-300 focus:outline-none focus:ring active:text-pink-400">
-                      Log In
-                    </button>
+                  <div className="col-span-6 sm:grid sm:items-center sm:gap-4">
+                    <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
+                      <button className="inline-block shrink-0 rounded-md border border-pink-600 bg-pink-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-pink-300 focus:outline-none focus:ring active:text-pink-400">
+                        Log In
+                      </button>
+                      <button
+                        onClick={handleForgotPassword}
+                        className="text-sm text-pink-500 hover:text-indigo-100 cursor-pointer mt-2 sm:mt-0 ml-2"
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
 
-                    <p className="mt-4 text-sm text-blue-300 sm:mt-0">
+                    <p className="mt-4 text-sm text-blue-300 sm:mt-4">
                       <span>New to Synth? </span>
                       <Link
                         className="text-pink-500 hover:text-indigo-100 cursor-pointer"
@@ -316,9 +370,14 @@ function LogIn() {
           <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
             <div className="text-center">
               <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900">
+                <h2 className="text-lg font-medium text-gray-900">
                   Email Verification Pending
-                </h3>
+                </h2>
+                {verificationError && (
+                  <div className="text-sm text-gray-700">
+                    {verificationError}
+                  </div>
+                )}
                 <div className="mt-2">
                   <div className="text-sm text-gray-500">
                     We have just sent you an email with a verification link to
@@ -351,7 +410,7 @@ function LogIn() {
           <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
             <div className="text-center">
               <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900">Oops!</h3>
+                <h2 className="text-lg font-medium text-gray-900">Oops!</h2>
                 <div className="mt-2">
                   <div className="text-sm text-gray-500">{loginError}</div>
                 </div>
@@ -366,6 +425,46 @@ function LogIn() {
                   setLoginModal(false);
                   setLoginError(false);
                 }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {forgotPasswordModal && (
+        <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
+            <div className="text-center">
+              <div className="mt-4">
+                {forgotPasswordError ? (
+                  <h2>{forgotPasswordError}</h2>
+                ) : (
+                  <div>
+                    <h2 className="text-lg font-medium text-gray-900">
+                      Forgot Password
+                    </h2>
+                    <div className="mt-2">
+                      <div className="text-sm text-gray-500">
+                        A password reset email has been sent to your email
+                        address. Please check your inbox and follow the
+                        instructions to reset your password.
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-pink-600 rounded-md shadow-sm hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 sm:w-auto sm:text-sm"
+                onClick={() => setForgotPasswordModal(false)}
               >
                 Close
               </button>

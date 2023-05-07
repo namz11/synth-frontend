@@ -10,7 +10,7 @@ export const checkFirstName = (str) => {
   const words = str.trim().split(/\s+/);
   for (let i = 0; i < words.length; i++) {
     if (words[i].length < 2) {
-      throw "First Name must be at least two characters long";
+      throw "Any part of your First Name must be at least two characters long";
     }
   }
 
@@ -29,7 +29,7 @@ export const checkLastName = (str) => {
   const words = str.trim().split(/\s+/);
   for (let i = 0; i < words.length; i++) {
     if (words[i].length < 2) {
-      throw "Last Name must be at least two characters long";
+      throw "Any part of your Last Name must be at least two characters long";
     }
   }
 
@@ -64,4 +64,18 @@ export const validateImageInput = (file) => {
 
   console.log("Enters Success Zone");
   return file;
+};
+
+export const checkPassword = (str) => {
+  if (!str) {
+    throw new Error("Enter a password");
+  }
+
+  const reg =
+    /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])(?=.*\d)[a-zA-Z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?\d]{6,}$/g;
+  if (!reg.test(str)) {
+    throw "Enter a valid password";
+  }
+
+  return str;
 };
