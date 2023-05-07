@@ -102,6 +102,22 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
         <div className="h-1/4 container mx-auto py-8 flex flex-wrap">
           <div className="w-3/10 flex items-center justify-center px-10 lg:px-4 mx-auto md:mx-0">
             <div className="shrink-0 w-48 overflow-hidden bg-transparent">
+              {/* {!tracksData ? (
+                <div className="bg-gray-800 w-full h-48 opacity-70"></div>
+              ) : (
+                <div className="flex flex-row flex-wrap justify-start content-start">
+                  {tracksData.slice(0, 4).map((track, index) => (
+                    <img
+                      key={index}
+                      className="object-cover w-24 h-24"
+                      src={
+                        track.album.images[0] ? track.album.images[0].url : ""
+                      }
+                      alt="playlist image"
+                    />
+                  ))}
+                </div>
+              )} */}
               {!tracksData ? (
                 <div className="bg-gray-800 w-full h-48 opacity-70"></div>
               ) : (
@@ -114,6 +130,15 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
                         track.album.images[0] ? track.album.images[0].url : ""
                       }
                       alt="playlist image"
+                    />
+                  ))}
+
+                  {Array.from({
+                    length: Math.max(4 - (tracksData.length || 0), 0),
+                  }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="object-cover w-24 h-24 bg-gray-800 opacity-70" // Empty box styling
                     />
                   ))}
                 </div>
@@ -183,144 +208,99 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
       </div>
 
       {resultModal && resultResponse && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div
-              className="fixed inset-0 transition-opacity"
-              aria-hidden="true"
-            >
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+        <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
+            <div className="text-center">
+              <div className="mt-4">
+                <div className="text-lg font-medium text-gray-900">{`Track ${resultResponse}`}</div>
+              </div>
             </div>
 
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full sm:max-w-md">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <div
-                      className="text-lg leading-6 font-medium text-gray-900"
-                      id="modal-title"
-                    >
-                      {`${resultResponse}`}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-600 text-base font-medium text-white hover:bg-pink-700 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={() => {
-                    setResultModal(false);
-                  }}
-                >
-                  Close
-                </button>
-              </div>
+            <div className="mt-8 text-center">
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-pink-600 rounded-md shadow-sm hover:bg-pink-700 sm:w-auto sm:text-sm"
+                onClick={() => setResultModal(false)}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {deleteModal && resultResponse && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div
-              className="fixed inset-0 transition-opacity"
-              aria-hidden="true"
-            >
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+        <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl mb-28 rounded-lg sm:p-8">
+            <div className="text-center">
+              <div className="mt-4">
+                <div className="text-lg font-medium text-gray-900">{`Track ${resultResponse}`}</div>
+              </div>
             </div>
 
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full sm:max-w-md">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <div
-                      className="text-lg leading-6 font-medium text-gray-900"
-                      id="modal-title"
-                    >
-                      {`${resultResponse}`}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-600 text-base font-medium text-white hover:bg-pink-700 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={() => {
-                    setResultModal(false);
-                    router.push("/user/playlists");
-                  }}
-                >
-                  Close
-                </button>
-              </div>
+            <div className="mt-8 text-center">
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-pink-600 rounded-md shadow-sm hover:bg-pink-700 sm:w-auto sm:text-sm"
+                onClick={() => {
+                  setDeleteModal(false);
+                  router.push("/user/playlists");
+                }}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {nameModal && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div
-              className="fixed inset-0 transition-opacity"
-              aria-hidden="true"
-            >
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
+        <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
 
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full sm:max-w-md">
-              <div
-                className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4"
-                aria-label="Edit Playlist Name Popup"
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg mb-28 sm:p-8">
+            <div className="text-center">
+              <div className="mt-4">
+                <label>
+                  <input
+                    type="text"
+                    className="mt-4 p-2 border border-gray-300 rounded-md w-full"
+                    placeholder="Playlist Name..."
+                    value={newName || originalName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    aria-label="New Playlist Name Input"
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <button
+                type="button"
+                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-700 text-base font-medium text-white hover:bg-pink-800 sm:ml-3 sm:w-auto sm:text-sm"
+                onClick={() => {
+                  closeModal();
+                  setNewName(null);
+                }}
               >
-                <div
-                  className="sm:flex sm:items-start"
-                  aria-label="Edit Playlist Name Popup"
-                >
-                  <div
-                    className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left"
-                    aria-label="Edit Playlist Name Popup"
-                  >
-                    <div
-                      className="text-lg leading-6 font-medium text-gray-900"
-                      id="modal-title"
-                    >
-                      <label>
-                        <input
-                          type="text"
-                          className="mt-4 p-2 border border-gray-300 rounded-md w-full"
-                          placeholder="Playlist Name..."
-                          value={newName || originalName}
-                          onChange={(e) => setNewName(e.target.value)}
-                          aria-label="New Playlist Name Input"
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-700 text-base font-medium text-white hover:bg-pink-800 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={() => {
-                    closeModal();
-                    setNewName(null);
-                  }}
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-700 text-base font-medium text-white hover:bg-pink-800 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={handleUpdateName}
-                >
-                  Update Name
-                </button>
-              </div>
+                Close
+              </button>
+              <button
+                type="button"
+                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-700 text-base font-medium text-white hover:bg-pink-800 sm:ml-3 sm:w-auto sm:text-sm"
+                onClick={handleUpdateName}
+              >
+                Update Name
+              </button>
             </div>
           </div>
         </div>
