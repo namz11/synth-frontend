@@ -130,7 +130,7 @@ function LogIn() {
       switch (errorMessage) {
         case "auth/too-many-requests":
           setVerificationError(
-            "Too many requests. Please try again after some time."
+            "Check your inbox and spam folder again. If you can't find the confirmation email, try the login button again shortly!"
           );
           break;
         case "auth/network-request-failed":
@@ -216,7 +216,7 @@ function LogIn() {
           break;
         case "auth/too-many-requests":
           setLoginError(
-            "Too many attempts. Please wait a few minutes before trying again."
+            "Check your inbox and spam folder again. If you can't find the confirmation email, try the login button again shortly!"
           );
 
           break;
