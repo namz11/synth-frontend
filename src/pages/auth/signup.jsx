@@ -35,6 +35,7 @@ import {
   checkLastName,
   checkEmail,
   validateImageInput,
+  checkPassword,
 } from "@utils/helpers";
 
 import DatePicker from "react-datepicker";
@@ -122,6 +123,7 @@ function SignUp() {
   const [error, setError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [weakPassword, setWeakPassword] = useState(false);
   const [lastnameError, setLastnameError] = useState(false);
   const [firstnameError, setFirstnameError] = useState(false);
   const [dateError, setDateError] = useState(false);
@@ -204,6 +206,23 @@ function SignUp() {
       setPasswordError(false);
     }
 
+    try {
+      const passwordTest = checkPassword(password);
+    } catch (e) {
+      console.log(e);
+      console.log(password);
+      setSignupError(
+        "The password is too weak. Please choose a stronger password."
+      );
+      setSignupModal(true);
+      setWeakPassword(true);
+      return;
+    }
+
+    if (weakPassword !== false) {
+      setWeakPassword(false);
+    }
+
     // Date Error Management
     if (calculateAge(dob) < 13) {
       setDateError(
@@ -278,6 +297,7 @@ function SignUp() {
             setSignupError(
               "The password is too weak. Please choose a stronger password."
             );
+            setWeakPassword(true);
             break;
           default:
             setSignupError(
@@ -428,6 +448,7 @@ function SignUp() {
                       scrollableMonthYearDropdown
                       closeCalendar
                       required={true}
+                      aria-label="Date of Birth"
                     />
                     {dateError && (
                       <p className="text-pink-500 font-medium text-sm mt-2">
@@ -562,13 +583,34 @@ function SignUp() {
           <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
             <div className="text-center">
               <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900">Oops!</h3>
+                <h2 className="text-lg font-medium text-gray-900">Oops!</h2>
                 <div className="mt-2">
                   <div className="text-sm text-gray-500">{signupError}</div>
                 </div>
+                {weakPassword && (
+                  <div className="text-gray-900 text-sm mt-4">
+                    Make sure your password meets the following requirements:
+                    <ul className="text-sm text-gray-500 list-inside list-disc text-left">
+                      <li className="ml-1 mt-1">
+                        Must be at least 6 characters long
+                      </li>
+                      <li className="ml-1 mt-1">
+                        Must contain at least one uppercase letter
+                      </li>
+                      <li className="ml-1 mt-1">
+                        Must contain at least one lowercase letter
+                      </li>
+                      <li className="ml-1 mt-1">
+                        Must contain at least one number
+                      </li>
+                      <li className="ml-1 mt-1">
+                        Must contain at least one special character
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
-
             <div className="mt-8 text-center">
               <button
                 type="button"
@@ -576,6 +618,7 @@ function SignUp() {
                 onClick={() => {
                   setSignupModal(false);
                   setSignupError(false);
+                  setWeakPassword(false);
                 }}
               >
                 Close
