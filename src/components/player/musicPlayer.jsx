@@ -57,14 +57,14 @@ function MusicPlayer() {
     tok = await user.getIdToken();
     try {
       res = await axios.post(
+        "/api/tracks/user/add",
+        {
+          trackId: trackId,
+        },
         {
           headers: {
             Authorization: `Bearer ${tok}`,
           },
-        },
-        "/api/tracks/user/add",
-        {
-          trackId: trackId,
         }
       );
     } catch (e) {
