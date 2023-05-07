@@ -7,6 +7,7 @@ import { PlaylistContext } from "@context/PlaylistContext";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@utils/firebase";
+import Loader from "@components/loader/loader";
 
 function UserPlaylist() {
   const router = useRouter();
@@ -75,7 +76,9 @@ function UserPlaylist() {
   if (loader) {
     return (
       <>
-        <div>Loading</div>
+        <MainLayout>
+          <Loader />
+        </MainLayout>
       </>
     );
   } else {

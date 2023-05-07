@@ -8,6 +8,7 @@ import ArtistComponent from "@components/artist/artist";
 import { AuthContext } from "@context/AuthContext";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, signIn } from "@utils/firebase";
+import Loader from "@components/loader/loader";
 
 const Artist = () => {
   const router = useRouter();
@@ -67,7 +68,9 @@ const Artist = () => {
   if (loader) {
     return (
       <>
-        <div>Loading</div>
+        <MainLayout>
+          <Loader />
+        </MainLayout>
       </>
     );
   } else {

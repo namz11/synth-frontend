@@ -9,6 +9,7 @@ import axios from "axios";
 import { AuthContext } from "@context/AuthContext";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, signIn } from "@utils/firebase";
+import Loader from "@components/loader/loader";
 
 const Playlist = () => {
   const router = useRouter();
@@ -59,7 +60,9 @@ const Playlist = () => {
   if (loader) {
     return (
       <>
-        <div>Loading</div>
+        <MainLayout>
+          <Loader />
+        </MainLayout>
       </>
     );
   } else {
