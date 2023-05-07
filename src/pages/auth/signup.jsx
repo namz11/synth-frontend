@@ -276,7 +276,7 @@ function SignUp() {
             email,
             photoURL,
             emailVerified: false,
-            recentTracks: [],
+            tracks: [],
           });
           console.log("The above code got fired?");
         } catch (error) {
