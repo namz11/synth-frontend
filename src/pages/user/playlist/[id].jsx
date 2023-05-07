@@ -17,6 +17,7 @@ function UserPlaylist() {
 
   const [loader, setLoading] = useState(true);
   const [token, setToken] = useState(null);
+  const [error, setError] = useState(false);
   const {
     setFullPlaylistData,
     setFullTracksData,
@@ -40,24 +41,27 @@ function UserPlaylist() {
           },
         });
 
-        setFullPlaylistData(data);
+        if (user.uid !== data.data.userId) {
+          setError(true);
+        } else {
+          setFullPlaylistData(data);
 
-        if (data) {
-          const trackDataArray = await Promise.all(
-            data.data.tracks.map(async (trackId) => {
-              const response = await axios(`/api/tracks/${trackId}`, {
-                headers: {
-                  Authorization: `Bearer ${theToken}`,
-                },
-              });
-              return response.data.data;
-            })
-          );
-
-          setFullTracksData(trackDataArray);
+          if (data) {
+            const trackDataArray = await Promise.all(
+              data.data.tracks.map(async (trackId) => {
+                const response = await axios(`/api/tracks/${trackId}`, {
+                  headers: {
+                    Authorization: `Bearer ${theToken}`,
+                  },
+                });
+                return response.data.data;
+              })
+            );
+            setFullTracksData(trackDataArray);
+          }
+          setToken(theToken);
+          setLoading(false);
         }
-        setToken(theToken);
-        setLoading(false);
       }
     }
 
@@ -72,6 +76,37 @@ function UserPlaylist() {
       }
     }
   }, [id, user, loading, setFullPlaylistData, setFullTracksData]);
+
+  if (error) {
+    return (
+      <>
+        <MainLayout>
+          <div className="flex flex-col h-[75vh] md:h-[85vh] items-center justify-center text-white font-semibold">
+            <div className="w-full flex flex-col justify-center items-center">
+              <h1 className="text-9xl font-extrabold text-white tracking-widest">
+                403
+              </h1>
+              <div className="absolute bg-pink-500 text-white px-4 text-sm rotate-[15deg] mr-2 rounded-md">
+                Access Forbidden
+              </div>
+            </div>
+
+            <div className="flex my-4 justify-center text-center text-2xl text-white font-semibold py-2 tracking-wider">
+              The Playlist You Are Trying To Access Is Private!
+            </div>
+            <button
+              className="my-4 px-6 py-2 bg-pink-500 rounded-lg text-xl font-medium cursor-pointer hover:shadow-lg hover:shadow-slate-800"
+              onClick={() => {
+                router.push("/home");
+              }}
+            >
+              Go Home
+            </button>
+          </div>
+        </MainLayout>
+      </>
+    );
+  }
 
   if (loader) {
     return (
