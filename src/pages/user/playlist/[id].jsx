@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import MainLayout from "@components/layouts/main-layout";
 import axios from "axios";
 import { useRouter } from "next/router";
 import PlaylistFromUser from "@components/playlist/playlistFromUser";
-// import TrackListForPlaylist from "@components/trackList/trackListForUserPlaylist";
+import { PlaylistContext } from "@context/PlaylistContext";
 
-// #FIREBASEAUTH For authentication and authorisation
-import { AuthContext } from "@context/AuthContext";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, signIn } from "@utils/firebase";
+import { auth } from "@utils/firebase";
 
 function UserPlaylist() {
   const router = useRouter();
@@ -20,6 +18,8 @@ function UserPlaylist() {
   const [tracksData, setTracksData] = useState(null);
   const [loader, setLoading] = useState(true);
   const [token, setToken] = useState(null);
+  const { setFullPlaylistData, setFullTracksData } =
+    useContext(PlaylistContext);
 
   useEffect(() => {
     const logToken = async () => {
@@ -37,6 +37,7 @@ function UserPlaylist() {
           },
         });
         setPlaylistData(data);
+        setFullPlaylistData(data);
 
         if (data) {
           const trackDataArray = await Promise.all(
@@ -50,6 +51,7 @@ function UserPlaylist() {
             })
           );
           setTracksData(trackDataArray);
+          setFullTracksData(trackDataArray);
         }
         setToken(theToken);
         setLoading(false);
@@ -66,7 +68,7 @@ function UserPlaylist() {
         console.log("Denied due to unauthorized");
       }
     }
-  }, [id, user, loading]);
+  }, [id, user, loading, setFullPlaylistData, setFullTracksData]);
 
   if (loader) {
     return (
@@ -86,8 +88,6 @@ function UserPlaylist() {
               token={token}
             />
           )}
-          {/* <div className="text-white">{JSON.stringify(playlistData)}</div>
-          <TrackListForPlaylist tracks={tracksData} /> */}
         </MainLayout>
       </>
     );

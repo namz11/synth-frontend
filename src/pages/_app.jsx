@@ -4,6 +4,7 @@ import "@styles/globals.css";
 import { AuthContextProvider } from "@context/AuthContext";
 import MusicPlayer from "@components/player/musicPlayer";
 import { PlayerContextProvider } from "@context/PlayerContext";
+import { PlaylistProvider } from "@context/PlaylistContext";
 
 const App = ({ Component, pageProps }) => {
   return (
@@ -18,8 +19,10 @@ const App = ({ Component, pageProps }) => {
       </Head>
       <AuthContextProvider>
         <PlayerContextProvider>
-          <Component {...pageProps} />
-          <MusicPlayer />
+          <PlaylistProvider>
+            <Component {...pageProps} />
+            <MusicPlayer />
+          </PlaylistProvider>
         </PlayerContextProvider>
       </AuthContextProvider>
     </>

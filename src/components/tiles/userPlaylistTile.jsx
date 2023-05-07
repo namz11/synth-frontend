@@ -76,7 +76,6 @@ const PlaylistTile = ({ data }) => {
                         alt="playlist image"
                       />
                     ))}
-                    {/* Generate empty boxes */}
                     {Array.from({
                       length: Math.max(4 - (tracksData.length || 0), 0),
                     }).map((_, index) => (
