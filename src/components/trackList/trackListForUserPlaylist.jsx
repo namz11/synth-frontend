@@ -1,20 +1,30 @@
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { MdDelete } from "react-icons/md";
 import { spotifyApi } from "react-spotify-web-playback";
 import { PlayerContext } from "@context/PlayerContext";
 import { BsFillPlayFill } from "react-icons/bs";
+import { PlaylistContext } from "@context/PlaylistContext";
 
 function TrackListForUserPlaylist({ tracks, playlistId, token }) {
   const [resultModal, setResultModal] = useState(false);
   const [resultResponse, setResultResponse] = useState(false);
-  const [currentTracks, setCurrentTracks] = useState(tracks);
-
+  const {
+    setFullPlaylistData,
+    fullPlaylistData,
+    fullTracksData,
+    setFullTracksData,
+  } = useContext(PlaylistContext);
+  const [currentTracks, setCurrentTracks] = useState([]);
   const [hoveredIndex, setHoveredIndex] = useState(-1);
+  const [deletedTrackId, setDeletedTrackId] = useState(null);
 
-  const [deviceId, setDeviceId] = useContext(PlayerContext);
+  // const [deviceId, setDeviceId] = useContext(PlayerContext);
+  useEffect(() => {
+    setCurrentTracks(fullTracksData);
+  }, [fullTracksData]);
 
   function formatDuration(duration_ms) {
     const seconds = Math.floor((duration_ms / 1000) % 60);
@@ -35,9 +45,33 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
       })
       .then((response) => {
         setResultResponse(response.data.message);
-        setCurrentTracks((prevTracks) =>
-          prevTracks.filter((track) => track.id !== trackId)
+        // setCurrentTracks((prevTracks) =>
+        //   prevTracks.filter((track) => track.id !== trackId)
+        // );
+        setCurrentTracks((prevTracks) => {
+          const updatedTracks = prevTracks.filter(
+            (track) => track.id !== trackId
+          );
+
+          // Update the fullTracksData in the context
+          setFullTracksData(updatedTracks);
+
+          return updatedTracks;
+        });
+
+        const updatedTracks = fullPlaylistData.data.tracks.filter(
+          (track) => track !== trackId
         );
+        const updatedFullPlaylistData = {
+          ...fullPlaylistData,
+          data: {
+            ...fullPlaylistData.data,
+            tracks: updatedTracks,
+          },
+        };
+        setFullPlaylistData(updatedFullPlaylistData);
+
+        console.log(fullPlaylistData);
       })
       .catch((error) => {
         console.error(error);

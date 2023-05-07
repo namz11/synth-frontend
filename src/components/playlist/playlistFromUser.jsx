@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { PlayerContext } from "@context/PlayerContext";
 import { spotifyApi } from "react-spotify-web-playback";
+import { PlaylistContext } from "@context/PlaylistContext";
 
 function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
   const router = useRouter();
@@ -16,9 +17,11 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
   const [deviceId, setDeviceId] = useContext(PlayerContext);
   const [originalName, setOriginalName] = useState(null);
 
+  const { fullPlaylistData, fullTracksData } = useContext(PlaylistContext);
+
   useEffect(() => {
-    setOriginalName(playlistData.data.name);
-  }, [playlistData.data.name]);
+    setOriginalName(fullPlaylistData.data.name);
+  }, [fullPlaylistData.data.name]);
 
   function handleDeletePlaylist() {
     const url = `/api/user/playlists/${playlistId}`;
@@ -47,6 +50,22 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
   };
 
   const handleUpdateName = () => {
+    if (!newName || newName.trim() === "") {
+      setResultResponse("Playlist name cannot be empty.");
+      setNameModal(false);
+      setNewName(null);
+      setResultModal(true);
+      return;
+    }
+
+    if (newName.length > 40) {
+      setResultResponse("Playlist name cannot exceed 40 characters.");
+      setNameModal(false);
+      setNewName(null);
+      setResultModal(true);
+      return;
+    }
+
     const url = `/api/user/playlists/${playlistId}`;
     axios
       .put(
@@ -118,11 +137,11 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
                   ))}
                 </div>
               )} */}
-              {!tracksData ? (
+              {!fullTracksData ? (
                 <div className="bg-gray-800 w-full h-48 opacity-70"></div>
               ) : (
                 <div className="flex flex-row flex-wrap justify-start content-start">
-                  {tracksData.slice(0, 4).map((track, index) => (
+                  {fullTracksData.slice(0, 4).map((track, index) => (
                     <img
                       key={index}
                       className="object-cover w-24 h-24"
@@ -150,15 +169,15 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
               {`playlist`.toUpperCase()}
             </p>
             <p className="text-4xl lg:text-7xl font-bold mb-2">
-              {newName || playlistData.data.name}
+              {newName || fullPlaylistData.data.name}
             </p>
             {playlistData.data.tracks !== [] && playlistData.data.userId && (
               <p className="text-pink-500 text-lg lg:text-2xl font-regular">
                 {/* {playlistData.data.userId.toUpperCase()} &bull;{" "} */}
-                {playlistData.data.tracks.length === 1 ? (
-                  <span>{`${playlistData.data.tracks.length} Track`}</span>
+                {fullPlaylistData.data.tracks.length === 1 ? (
+                  <span>{`${fullPlaylistData.data.tracks.length} Track`}</span>
                 ) : (
-                  <span>{`${playlistData.data.tracks.length} Tracks`}</span>
+                  <span>{`${fullPlaylistData.data.tracks.length} Tracks`}</span>
                 )}
               </p>
             )}
@@ -184,13 +203,12 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
           <div className="text-3xl text-white font-semibold px-4 lg:px-0">
             Tracks
           </div>
-          {/* If playlist length is equal to zero, don't render */}
-          {tracksData.length !== 0 && (
+          {fullTracksData.length !== 0 && (
             <div
               className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md py-4 hover:bg-gray-800 cursor-pointer mt-3"
               onClick={() => {
                 let trackUriList = [];
-                tracksData.forEach((track) => {
+                fullTracksData.forEach((track) => {
                   trackUriList.push(track.uri);
                 });
                 handlePlayerAdd(trackUriList);
