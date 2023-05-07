@@ -144,7 +144,6 @@ function LogIn() {
           );
       }
       setVerificationModal(true);
-      console.log(errorMessage);
     }
   };
 
@@ -182,9 +181,6 @@ function LogIn() {
     try {
       const userCredential = await signIn(auth, email, password);
       const user = userCredential.user;
-      {
-        console.log(`EMAIL VERIFIED? ${user.emailVerified}`);
-      }
       if (user.emailVerified === true) {
         setVerificationError(false);
         dispatch({ type: "LOGIN", payload: user });

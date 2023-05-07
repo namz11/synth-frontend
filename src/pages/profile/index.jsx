@@ -118,8 +118,6 @@ const Profile = () => {
 
   const handleEditClick = () => {
     setEditing(true);
-    console.log(photo);
-    console.log(user.photoURL);
   };
 
   const { dispatch } = useContext(AuthContext);
@@ -127,7 +125,6 @@ const Profile = () => {
     const auth = getAuth();
     signOut(auth)
       .then(() => {
-        console.log("Successfully Logged Out!");
         dispatch({ type: "LOGOUT" });
         router.push("/");
       })
@@ -138,7 +135,6 @@ const Profile = () => {
 
   const handleSaveClick = async () => {
     let updatedPhotoURL = photo || user.photoURL || "/user.png";
-    console.log(updatedPhotoURL);
 
     if (photoChanged) {
       updatedPhotoURL = await uploadProfileImage(photo, user.uid);
@@ -148,7 +144,6 @@ const Profile = () => {
     } else {
       user.photoURL;
     }
-    console.log(updatedPhotoURL);
 
     try {
       await updateDoc(doc(db, "users", user.uid), {
@@ -166,7 +161,6 @@ const Profile = () => {
           setImageError(e);
           return;
         }
-        console.log("Success Most Probably");
       }
       if (imageError !== false) {
         setImageError(false);

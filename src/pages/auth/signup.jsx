@@ -165,7 +165,6 @@ function SignUp() {
         setImageError(e);
         return;
       }
-      console.log("Success Most Probably");
     }
     if (imageError !== false) {
       setImageError(false);
@@ -216,8 +215,6 @@ function SignUp() {
     try {
       const passwordTest = checkPassword(password);
     } catch (e) {
-      console.log(e);
-      console.log(password);
       setSignupError(
         "The password is too weak. Please choose a stronger password."
       );
@@ -278,7 +275,6 @@ function SignUp() {
             emailVerified: false,
             tracks: [],
           });
-          console.log("The above code got fired?");
         } catch (error) {
           console.error("Error while saving user data to Firestore:", error);
         }
@@ -311,7 +307,6 @@ function SignUp() {
             setSignupError(
               "An unexpected error occurred. Please try again later."
             );
-            console.log(error);
         }
         setSignupModal(true);
       });

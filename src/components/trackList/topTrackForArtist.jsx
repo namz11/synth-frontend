@@ -62,7 +62,6 @@ function TopTrackForArtist({ topTracks, token }) {
         )
         .then((response) => {
           // Navigate
-          // console.log(response.data);
           setResultResponse(response.data.message);
         })
         .catch((error) => {

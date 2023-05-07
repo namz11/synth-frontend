@@ -38,7 +38,6 @@ const MyPlaylists = () => {
           },
         }
       );
-      console.log(data);
       if (data?.success) {
         setIsOpen(false);
         fetchUserPlaylists(token);
@@ -58,7 +57,6 @@ const MyPlaylists = () => {
         Authorization: `Bearer ${theToken}`,
       },
     });
-    console.log("user playlists", data);
     setUserPlaylists(data?.items);
   }
 

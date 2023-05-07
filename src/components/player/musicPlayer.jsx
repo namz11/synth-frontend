@@ -70,7 +70,6 @@ function MusicPlayer() {
     } catch (e) {
       console.error(e);
     }
-    console.log(res);
   };
 
   return (
@@ -91,7 +90,6 @@ function MusicPlayer() {
               // Set the current track
               setCurrentTrack(state.track.uri);
               let trackId = state.track.uri.split(":")[2];
-              console.log(trackId);
               // Add the track as being played by the user in the database.
               addTrackToDatabase(trackId);
             }

@@ -69,8 +69,6 @@ function TrackListForUserPlaylist({ playlistId, token }) {
           },
         };
         setFullPlaylistData(updatedFullPlaylistData);
-
-        console.log(fullPlaylistData);
       })
       .catch((error) => {
         console.error(error);
@@ -92,7 +90,6 @@ function TrackListForUserPlaylist({ playlistId, token }) {
     spotifyToken = spotifyToken.data.token;
 
     // Get the device id of the spotify player from context.
-    console.log(trackUriList);
     await spotifyApi.play(spotifyToken, {
       uris: trackUriList,
       deviceId: deviceId,

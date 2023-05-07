@@ -24,7 +24,6 @@ const Header = () => {
     const auth = getAuth();
     signOut(auth)
       .then(() => {
-        console.log("Successfully Logged Out!");
         dispatch({ type: "LOGOUT" });
         router.push("/auth/login");
       })
@@ -45,7 +44,6 @@ const Header = () => {
   }, [router, searchTerm]);
 
   const logInRedirect = () => {
-    console.log("PLEASE LOGIN");
     router.push("/auth/login");
   };
 

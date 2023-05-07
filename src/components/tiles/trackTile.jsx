@@ -11,7 +11,6 @@ const TrackTile = ({ data, token }) => {
 
   async function handlePlayerAdd(trackUriList, token) {
     let spotifyToken;
-    console.log(token);
     const getSpotifyToken = async () => {
       spotifyToken = await axios(`/api/token`, {
         headers: {
@@ -23,7 +22,6 @@ const TrackTile = ({ data, token }) => {
     spotifyToken = spotifyToken.data.token;
 
     // Get the device id of the spotify player from context.
-    console.log(trackUriList);
     await spotifyApi.play(spotifyToken, {
       uris: trackUriList,
       deviceId: deviceId,

@@ -61,7 +61,6 @@ function TrackList({ tracks, token }) {
         )
         .then((response) => {
           // Navigate
-          console.log(response.data.message);
           setResultResponse(response.data.message);
         })
         .catch((error) => {

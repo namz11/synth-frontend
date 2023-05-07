@@ -35,7 +35,6 @@ const Home = () => {
           Authorization: `Bearer ${theToken}`,
         },
       });
-      console.log("recent", data);
       setRecentTracks(data?.items);
     }
     async function fetchMostPlayed(theToken) {
@@ -44,7 +43,6 @@ const Home = () => {
           Authorization: `Bearer ${theToken}`,
         },
       });
-      console.log("most-played", data);
       setMostPlayed(data?.items);
     }
     async function fetchFeaturedPlaylists(theToken) {
@@ -53,7 +51,6 @@ const Home = () => {
           Authorization: `Bearer ${theToken}`,
         },
       });
-      console.log("featured", data);
       setFeaturedPlaylist(data);
     }
     async function fetchCategoryPlaylists(theToken) {
@@ -62,7 +59,6 @@ const Home = () => {
           Authorization: `Bearer ${theToken}`,
         },
       });
-      console.log("category", data);
       setCategoryPlaylists(data);
     }
 
