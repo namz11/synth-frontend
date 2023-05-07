@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@utils/firebase";
+import MainLayout from "./layouts/main-layout";
+import Loader from "./loader/loader";
 
 const withAuth = (WrappedComponent) => {
   return (props) => {
@@ -17,7 +19,13 @@ const withAuth = (WrappedComponent) => {
     }, [user, loading, router]);
 
     if (loading) {
-      return <div>Loading...</div>; // to be replaced with loading spinner
+      return (
+        <>
+          <MainLayout>
+            <Loader />
+          </MainLayout>
+        </>
+      ); // to be replaced with loading spinner
     }
 
     return user ? <WrappedComponent {...props} /> : null;

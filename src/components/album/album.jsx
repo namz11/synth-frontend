@@ -5,6 +5,8 @@ import TrackList from "@components/trackList/trackList";
 import axios from "axios";
 import { spotifyApi } from "react-spotify-web-playback";
 import { PlayerContext } from "@context/PlayerContext";
+import MainLayout from "@components/layouts/main-layout";
+import Loader from "@components/loader/loader";
 
 function Album({ albumData, token }) {
   const [deviceId, setDeviceId] = useContext(PlayerContext);
@@ -121,7 +123,9 @@ function Album({ albumData, token }) {
   } else {
     return (
       <>
-        <div>Loading...</div>
+        <MainLayout>
+          <Loader />
+        </MainLayout>
       </>
     );
   }

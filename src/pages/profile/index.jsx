@@ -18,6 +18,7 @@ import {
   checkLastName,
   validateImageInput,
 } from "@utils/helpers";
+import Loader from "@components/loader/loader";
 
 const db = getFirestore();
 
@@ -213,7 +214,11 @@ const Profile = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <MainLayout>
+        <Loader />
+      </MainLayout>
+    );
   }
 
   return (

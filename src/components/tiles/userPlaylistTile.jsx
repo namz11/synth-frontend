@@ -52,7 +52,9 @@ const PlaylistTile = ({ data }) => {
   if (loader) {
     return (
       <>
-        <span></span>
+        <div className="shrink-0 w-48 overflow-hidden bg-transparent flex items-center justify-center">
+          <img src="/rotation.gif" alt="loader" width={30} height={30} />
+        </div>
       </>
     );
   } else {
