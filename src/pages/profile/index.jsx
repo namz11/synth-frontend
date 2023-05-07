@@ -40,6 +40,7 @@ const Profile = () => {
   const [lastnameError, setLastnameError] = useState(false);
   const [firstnameError, setFirstnameError] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [photoFile, setPhotoFile] = useState(null);
 
   const uploadProfileImage = async (file, userUid) => {
     const storage = getStorage();
@@ -65,6 +66,7 @@ const Profile = () => {
   const handlePhotoChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setPhoto(e.target.files[0]);
+      setPhotoFile(URL.createObjectURL(e.target.files[0]));
       setPhotoChanged(true);
     }
   };
@@ -105,6 +107,14 @@ const Profile = () => {
     fetchUserData();
   }, [router, user]);
 
+  useEffect(() => {
+    return () => {
+      if (photo && photoChanged) {
+        URL.revokeObjectURL(photoFile);
+      }
+    };
+  }, [photoFile, photoChanged]);
+
   const handleEditClick = () => {
     setEditing(true);
     console.log(photo);
@@ -133,6 +143,7 @@ const Profile = () => {
       updatedPhotoURL = await uploadProfileImage(photo, user.uid);
       await updateProfile(user, { photoURL: updatedPhotoURL });
       setPhoto(updatedPhotoURL);
+      setPhotoFile(updatedPhotoURL);
     } else {
       user.photoURL;
     }
@@ -147,7 +158,7 @@ const Profile = () => {
       });
 
       // Image Error Management
-      if (photo) {
+      if (photo && photoChanged) {
         try {
           const imageTest = validateImageInput(photo);
         } catch (e) {
@@ -208,141 +219,184 @@ const Profile = () => {
   return (
     <>
       <MainLayout>
-        <div className="max-w-xl lg:max-w-3xl mx-auto py-8">
-          <img
-            className="w-24 h-24 mb-6 mx-auto rounded-full object-cover"
-            src={user ? photo || user.photoURL || "/user.png" : "/user.png"}
-            alt="User Avatar"
-          />
-          {editing ? (
-            <>
-              <div className="mb-4">
-                <label
-                  htmlFor="Photo"
-                  className="block text-white text-lg font-bold mb-2"
-                >
-                  Profile Photo:
-                </label>
-                <input
-                  type="file"
-                  id="Photo"
-                  onChange={handlePhotoChange}
-                  accept="image/*"
-                  className="w-full text-white bg-blue-700 rounded py-2 px-4"
+        <div className="min-w-screen min-h-screen bg-slate-900 flex items-center justify-center px-5 py-5">
+          <div
+            className="bg-slate-900 text-white rounded-3xl w-full overflow-hidden"
+            style={{ maxWidth: "1000px" }}
+          >
+            <div className="md:flex w-full items-center">
+              <div className="block w-1/2 bg-slate-900 mx-auto md:mx-0 mt-4 md:mt-0">
+                <img
+                  className="w-64 h-64 mb-6 mx-auto rounded-full object-cover"
+                  src={
+                    user
+                      ? photoFile || photo || user.photoURL || "/user.png"
+                      : "/user.png"
+                  }
+                  alt="User Avatar"
                 />
-                {imageError && <p style={{ color: "red" }}>{imageError}</p>}
               </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="FirstName"
-                  className="block text-white text-lg font-bold mb-2"
-                >
-                  First Name:
-                </label>
-                <input
-                  type="text"
-                  id="FirstName"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full text-white bg-blue-700 rounded py-2 px-4"
-                />
-                <br />
-                {firstnameError && (
-                  <p style={{ color: "red" }}>{firstnameError}</p>
+              <div className="w-full md:w-1/2 py-10 px-5 md:px-10">
+                {editing ? (
+                  <>
+                    <div className="text-center mb-10">
+                      <h1 className="font-bold text-3xl text-white">
+                        Edit Profile
+                      </h1>
+                      <p className="text-blue-300 mt-2">
+                        Update your information below
+                      </p>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="Photo"
+                        className="block text-cyan-300 text-sm font-medium mb-2 mt-3"
+                      >
+                        Profile Photo:
+                      </label>
+                      <input
+                        type="file"
+                        id="Photo"
+                        onChange={handlePhotoChange}
+                        accept="image/*"
+                        className="w-full text-gray-900 bg-white rounded py-2 px-4"
+                      />
+                      {imageError && (
+                        <p className="text-pink-500 font-medium text-sm mt-2">
+                          {imageError}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <label
+                        htmlFor="FirstName"
+                        className="block text-cyan-300 text-sm font-medium mb-2 mt-3"
+                      >
+                        First Name:
+                      </label>
+                      <input
+                        type="text"
+                        id="FirstName"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        className="w-full text-gray-900 bg-white rounded py-2 px-4"
+                      />
+                      <br />
+                      {firstnameError && (
+                        <p className="text-pink-500 font-medium text-sm mt-2">
+                          {firstnameError}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <label
+                        htmlFor="LastName"
+                        className="block text-cyan-300 text-sm font-medium mb-2 mt-3"
+                      >
+                        Last Name:
+                      </label>
+                      <input
+                        type="text"
+                        id="LastName"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        className="w-full text-gray-900 bg-white rounded py-2 px-4"
+                      />
+                      <br />
+                      {lastnameError && (
+                        <p className="text-pink-500 font-medium text-sm mt-2">
+                          {lastnameError}
+                        </p>
+                      )}
+                    </div>
+                    {!isGoogleProvider && (
+                      <>
+                        <div className="mb-4">
+                          <label
+                            htmlFor="Password"
+                            className="block text-cyan-300 text-sm font-medium mb-2 mt-3"
+                          >
+                            New Password:
+                          </label>
+                          <input
+                            type="password"
+                            id="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full text-gray-900 bg-white border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring"
+                          />
+                        </div>
+                        <div className="col-span-6 sm:col-span-3">
+                          <label
+                            htmlFor="PasswordConfirmation"
+                            className="block text-cyan-300 text-sm font-medium mb-2 mt-3"
+                          >
+                            Password Confirmation
+                          </label>
+                          <input
+                            type="password"
+                            id="PasswordConfirmation"
+                            name="passwordConfirmation"
+                            placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+                            value={passwordConfirmation}
+                            onChange={(e) =>
+                              setPasswordConfirmation(e.target.value)
+                            }
+                            className="block w-full px-4 py-2 mt-2 text-gray-900 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring"
+                            required
+                          />
+                        </div>
+                        {passwordError && (
+                          <p className="text-pink-500 font-medium text-sm mt-2">
+                            {passwordError}
+                          </p>
+                        )}
+                      </>
+                    )}
+                    <button
+                      onClick={handleSaveClick}
+                      className="w-full bg-pink-600 text-white font-bold py-2 px-4 rounded transition hover:bg-pink-500 focus:outline-none focus:ring mt-6"
+                    >
+                      Save
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-center mb-10">
+                      <h1 className="font-bold text-3xl text-white">Profile</h1>
+                      <p className="text-blue-300 mt-2">Your information </p>
+                    </div>
+                    <div>
+                      <div className="text-cyan-300 text-md font-medium mb-6">
+                        Email: {email}
+                      </div>
+                      <div className="text-cyan-300 text-md font-medium mb-6">
+                        First Name: {firstName}
+                      </div>
+                      <div className="text-cyan-300 text-md font-medium mb-6">
+                        Last Name: {lastName}
+                      </div>
+                      <button
+                        onClick={handleEditClick}
+                        className="w-full my-3 bg-pink-600 text-white font-bold py-2 px-4 rounded transition hover:bg-pink-400 focus:outline-none focus:ring"
+                      >
+                        Edit
+                      </button>
+                      <div className="flex items-center mt-4 lg:mt-0">
+                        <button
+                          className="w-full bg-pink-600 text-white font-bold py-2 px-4 rounded transition hover:bg-pink-400 focus:outline-none focus:ring"
+                          aria-label="Logout"
+                          onClick={handleLogout}
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="LastName"
-                  className="block text-white text-lg font-bold mb-2"
-                >
-                  Last Name:
-                </label>
-                <input
-                  type="text"
-                  id="LastName"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full text-white bg-blue-700 rounded py-2 px-4"
-                />
-                <br />
-                {lastnameError && (
-                  <p style={{ color: "red" }}>{lastnameError}</p>
-                )}
-              </div>
-              {!isGoogleProvider && (
-                <>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="Password"
-                      className="block text-white text-lg font-bold mb-2"
-                    >
-                      New Password:
-                    </label>
-                    <input
-                      type="password"
-                      id="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full text-gray-700 bg-white border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring"
-                    />
-                  </div>
-                  <div className="col-span-6 sm:col-span-3">
-                    <label
-                      for="PasswordConfirmation"
-                      className="block text-white text-lg font-bold mb-2"
-                    >
-                      Password Confirmation
-                    </label>
-
-                    <input
-                      type="password"
-                      id="PasswordConfirmation"
-                      name="passwordConfirmation"
-                      placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                      value={passwordConfirmation}
-                      onChange={(e) => setPasswordConfirmation(e.target.value)}
-                      className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring"
-                      required
-                    />
-                  </div>
-                </>
-              )}
-              {/* {passwordError && (
-                <div className="text-red-500 mt-2">{passwordError}</div>
-              )} */}
-              {/* <br /> */}
-              {passwordError && <p style={{ color: "red" }}>{passwordError}</p>}
-              <button
-                onClick={handleSaveClick}
-                className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded transition hover:bg-blue-500 focus:outline-none focus:ring"
-              >
-                Save
-              </button>
-            </>
-          ) : (
-            <>
-              <h1 className="text-white text-xl font-bold mb-6">
-                Email: {email}
-              </h1>
-              <button
-                onClick={handleEditClick}
-                className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded transition hover:bg-blue-500 focus:outline-none focus:ring"
-              >
-                Edit
-              </button>
-
-              <div className="flex items-center mt-4 lg:mt-0">
-                <button
-                  className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded transition hover:bg-blue-500 focus:outline-none focus:ring"
-                  aria-label="Logout"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </button>
-              </div>
-            </>
-          )}
+            </div>
+          </div>
         </div>
       </MainLayout>
     </>

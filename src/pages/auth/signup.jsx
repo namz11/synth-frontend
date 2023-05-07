@@ -6,9 +6,24 @@ import { auth, signUp } from "@utils/firebase";
 import { AuthContext } from "@context/AuthContext";
 import Image from "next/image";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  collection,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 const db = getFirestore();
-import { updateProfile, sendEmailVerification, signOut } from "firebase/auth";
+import {
+  updateProfile,
+  sendEmailVerification,
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
 import {
   getStorage,
   ref,
@@ -62,6 +77,42 @@ function SignUp() {
     }
   }, [user, loading, router]);
 
+  const handleGoogleSignIn = () => {
+    signInWithPopup(auth, new GoogleAuthProvider())
+      .then(async (result) => {
+        const user = result.user;
+        dispatch({ type: "LOGIN", payload: user });
+        const { displayName, email, uid, photoURL, emailVerified } = user;
+        const nameParts = displayName.split(" ");
+        const firstName = nameParts[0];
+        const lastName =
+          nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+        const userDocRef = doc(db, "users", uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+          const response = await setDoc(userDocRef, {
+            firstName,
+            lastName,
+            displayName,
+            email,
+            photoURL,
+            emailVerified,
+          })
+            .then(() => {
+              console.log("Document written successfully!");
+            })
+            .catch((error) => {
+              console.error("Error writing document: ", error);
+            });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -77,6 +128,10 @@ function SignUp() {
   const [imageError, setImageError] = useState(false);
   const [signupError, setSignupError] = useState(false);
   const [signupModal, setSignupModal] = useState(false);
+  ///////////////////////////////////////////////////////////////////////////////
+  // const [verificationAlert, setVerificationAlert] = useState(false);
+  // const [verificationAlertModal, setVerificationAlertModal] = useState(false);
+  ///////////////////////////////////////////////////////////////////////////////
 
   const calculateAge = (dob) => {
     const today = new Date();
@@ -193,6 +248,10 @@ function SignUp() {
             recentTracks: [],
           });
           console.log("The above code got fired?");
+          // ///////////////////////////////////////////////////////////////////
+          // setVerificationAlert(true);
+          // setVerificationAlertModal(true);
+          // ///////////////////////////////////////////////////////////////////
         } catch (error) {
           console.error("Error while saving user data to Firestore:", error);
         }
@@ -231,8 +290,8 @@ function SignUp() {
 
   return (
     <>
-      <div className="mt-4">
-        <section className="bg-white">
+      <div>
+        <section className="bg-slate-900">
           <div className="lg:grid lg:min-h-[93vh] lg:grid-cols-12">
             <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
               <Image
@@ -246,21 +305,20 @@ function SignUp() {
 
             <main
               aria-label="Main"
-              className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:py-12 lg:px-16 xl:col-span-6"
+              className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:py-12 lg:px-16 xl:col-span-6 bg-slate-900"
             >
               <div className="max-w-xl lg:max-w-3xl">
                 <Link href="/" passHref>
-                  <span className="sr-only">Sign Up Page</span>
-                  <span className="self-center text-xl font-semibold whitespace-nowrap">
+                  <span className="self-center text-xl text-white font-semibold whitespace-nowrap">
                     Synth
                   </span>
                 </Link>
 
-                <h1 className="mt-6 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+                <h1 className="mt-6 text-2xl font-bold text-white sm:text-3xl md:text-4xl">
                   Join Synth today 🎵
                 </h1>
 
-                <p className="mt-4 leading-relaxed text-gray-500">
+                <p className="mt-4 leading-relaxed text-blue-300">
                   Create your Synth account and start exploring a world of
                   music. <br />
                   Sign up with your email and password today!
@@ -269,12 +327,12 @@ function SignUp() {
                 <form
                   action="#"
                   onSubmit={handleSignUp}
-                  className="mt-8 grid grid-cols-6 gap-6"
+                  className="mt-8 grid grid-cols-6 gap-6 bg-slate-900"
                 >
                   <div className="col-span-6">
                     <label
                       htmlFor="ProfileImage"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-cyan-200"
                     >
                       Profile Image
                     </label>
@@ -286,13 +344,17 @@ function SignUp() {
                       onChange={(e) => setProfileImage(e.target.files[0])}
                       className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring"
                     />
-                    {imageError && <p style={{ color: "red" }}>{imageError}</p>}
+                    {imageError && (
+                      <p className="text-pink-500 font-medium text-sm mt-2">
+                        {imageError}
+                      </p>
+                    )}
                   </div>
 
                   <div className="col-span-6 sm:col-span-3">
                     <label
                       htmlFor="FirstName"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-cyan-200"
                     >
                       First Name
                     </label>
@@ -308,14 +370,16 @@ function SignUp() {
                     />
                     <br />
                     {firstnameError && (
-                      <p style={{ color: "red" }}>{firstnameError}</p>
+                      <p className="text-pink-500 font-medium text-sm mt-2">
+                        {firstnameError}
+                      </p>
                     )}
                   </div>
 
                   <div className="col-span-6 sm:col-span-3">
                     <label
                       htmlFor="LastName"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-cyan-200"
                     >
                       Last Name
                     </label>
@@ -331,13 +395,15 @@ function SignUp() {
                     />
                     <br />
                     {lastnameError && (
-                      <p style={{ color: "red" }}>{lastnameError}</p>
+                      <p className="text-pink-500 font-medium text-sm mt-2">
+                        {lastnameError}
+                      </p>
                     )}
                   </div>
                   <div className="col-span-6 sm:col-span-3">
                     <label
                       htmlFor="DateOfBirth"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-cyan-200"
                     >
                       Date of Birth
                     </label>
@@ -349,23 +415,30 @@ function SignUp() {
                       minDate={
                         new Date(
                           `${new Date().getMonth()}/${new Date().getDate()}/${
-                            new Date().getFullYear() - 100
+                            new Date().getFullYear() - 150
                           }`
                         )
                       }
                       dateFormat="MM/dd/yyyy"
                       isClearable
                       showYearDropdown
+                      showMonthDropdown
+                      scrollableYearDropdown={true}
+                      yearDropdownItemNumber={150}
                       scrollableMonthYearDropdown
                       closeCalendar
                       required={true}
                     />
-                    {dateError && <p style={{ color: "red" }}>{dateError}</p>}
+                    {dateError && (
+                      <p className="text-pink-500 font-medium text-sm mt-2">
+                        {dateError}
+                      </p>
+                    )}
                   </div>
                   <div className="col-span-6">
                     <label
                       htmlFor="Email"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-cyan-200"
                     >
                       Email
                     </label>
@@ -381,13 +454,17 @@ function SignUp() {
                       required
                     />
                     <br />
-                    {emailError && <p style={{ color: "red" }}>{emailError}</p>}
+                    {emailError && (
+                      <p className="text-pink-500 font-medium text-sm mt-2">
+                        {emailError}
+                      </p>
+                    )}
                   </div>
 
                   <div className="col-span-6 sm:col-span-3">
                     <label
                       htmlFor="Password"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-cyan-200"
                     >
                       Password
                     </label>
@@ -407,7 +484,7 @@ function SignUp() {
                   <div className="col-span-6 sm:col-span-3">
                     <label
                       htmlFor="PasswordConfirmation"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-cyan-200"
                     >
                       Password Confirmation
                     </label>
@@ -424,26 +501,53 @@ function SignUp() {
                     />
                     <br />
                     {passwordError && (
-                      <p style={{ color: "red" }}>{passwordError}</p>
+                      <p className="text-pink-500 font-medium text-sm mt-2">
+                        {passwordError}
+                      </p>
                     )}
                   </div>
 
                   <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                     <button
-                      className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
+                      className="inline-block shrink-0 rounded-md border border-pink-600 bg-pink-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-pink-300 focus:outline-none focus:ring active:text-pink-400"
                       type="submit"
                     >
                       Sign Up
                     </button>
 
-                    <p className="mt-4 text-sm text-gray-500 sm:mt-0">
+                    <p className="mt-4 text-sm text-blue-300 sm:mt-0">
                       <span>Already have an account? </span>
-                      <Link href="/auth/login" passHref>
+                      <Link
+                        className="text-pink-500 hover:text-indigo-100 cursor-pointer"
+                        href="/auth/login"
+                        passHref
+                      >
                         Log In
                       </Link>
                     </p>
                   </div>
                 </form>
+                <div className="mt-6 grid grid-cols-4 gap-2">
+                  <div className="col-span-4 sm:col-span-2">
+                    <div className="w-auto py-2">
+                      <button
+                        className="flex items-center p-4 bg-white hover:bg-pink-100 rounded-lg transition ease-in-out duration-200 cursor-pointer border-purple-400"
+                        onClick={handleGoogleSignIn}
+                      >
+                        <img
+                          className="mr-3 w-[20px]"
+                          src="https://lh3.googleusercontent.com/COxitqgJr1sJnIDe8-jiKhxDx1FrYbtRHKJ9z_hELisAlapwE9LUPh6fcXIfb5vwpbMl4xl9H9TRFPc5NOO8Sb3VSgIBrfRYvW6cUA"
+                          alt="google"
+                          width="32"
+                          height="32"
+                        />
+                        <span className="font-semibold leading-normal">
+                          Sign in with Google
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </main>
           </div>
@@ -480,6 +584,43 @@ function SignUp() {
           </div>
         </div>
       )}
+      {/* {verificationAlert && verificationAlertModal && (
+        <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
+            <div className="text-center">
+              <div className="mt-4">
+                <h3 className="text-lg font-medium text-gray-900">
+                  Welcome to Synth!
+                </h3>
+                <div className="mt-2">
+                  <div className="text-sm text-gray-500">
+                    Upon a successful sign-up, you will receive a verification
+                    email. Click the link to get started and listen to some
+                    bangers!
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-pink-600 rounded-md shadow-sm hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 sm:w-auto sm:text-sm"
+                onClick={() => {
+                  setVerificationAlertModal(false);
+                  verificationAlert(false);
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )} */}
     </>
   );
 }

@@ -162,9 +162,7 @@ function LogIn() {
           );
           break;
         case "auth/user-not-found":
-          setLoginError(
-            "No account found for this email. Please check the email or create a new account."
-          );
+          setLoginError("Incorrect email or password. Please try again.");
 
           break;
         case "auth/wrong-password":
@@ -187,9 +185,9 @@ function LogIn() {
 
   return (
     <>
-      <div className="mt-4">
-        <section className="bg-white">
-          <div className="lg:grid lg:min-h-[93vh] lg:grid-cols-12">
+      <div>
+        <section className="bg-slate-900">
+          <div className="lg:grid lg:min-h-[101vh] lg:grid-cols-12">
             <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
               <Image
                 alt="Pattern"
@@ -206,17 +204,16 @@ function LogIn() {
             >
               <div className="max-w-xl lg:max-w-3xl">
                 <Link href="/" passHref>
-                  <span className="sr-only">Login Page</span>
-                  <span className="self-center text-xl font-semibold whitespace-nowrap">
+                  <span className="self-center text-xl font-semibold whitespace-nowrap text-white">
                     Synth
                   </span>
                 </Link>
 
-                <h1 className="mt-6 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+                <h1 className="mt-6 text-2xl font-bold text-white sm:text-3xl md:text-4xl">
                   Welcome back to Synth 🎵
                 </h1>
 
-                <p className="mt-4 leading-relaxed text-gray-500">
+                <p className="mt-4 leading-relaxed text-blue-300">
                   Access your Synth account to continue your listening journey.{" "}
                   <br />
                   Login with your credentials and start exploring today!
@@ -230,7 +227,7 @@ function LogIn() {
                   <div className="col-span-6">
                     <label
                       htmlFor="Email"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-cyan-200"
                     >
                       Email
                     </label>
@@ -250,7 +247,7 @@ function LogIn() {
                   <div className="col-span-6 sm:col-span-3">
                     <label
                       htmlFor="Password"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-cyan-200"
                     >
                       Password
                     </label>
@@ -268,13 +265,17 @@ function LogIn() {
                   </div>
 
                   <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                    <button className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-20 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500">
+                    <button className="inline-block shrink-0 rounded-md border border-pink-600 bg-pink-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-pink-300 focus:outline-none focus:ring active:text-pink-400">
                       Log In
                     </button>
 
-                    <p className="mt-4 text-sm text-gray-500 sm:mt-0">
+                    <p className="mt-4 text-sm text-blue-300 sm:mt-0">
                       <span>New to Synth? </span>
-                      <Link href="/auth/signup" passHref>
+                      <Link
+                        className="text-pink-500 hover:text-indigo-100 cursor-pointer"
+                        href="/auth/signup"
+                        passHref
+                      >
                         Sign Up
                       </Link>
                     </p>
@@ -284,7 +285,7 @@ function LogIn() {
                   <div className="col-span-4 sm:col-span-2">
                     <div className="w-auto py-2">
                       <button
-                        className="flex items-center p-4 bg-white hover:bg-gray-50 border rounded-lg transition ease-in-out duration-200 cursor-pointer"
+                        className="flex items-center p-4 bg-white hover:bg-pink-100 rounded-lg transition ease-in-out duration-200 cursor-pointer border-purple-400"
                         onClick={handleGoogleSignIn}
                       >
                         <img
