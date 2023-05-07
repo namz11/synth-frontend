@@ -50,6 +50,10 @@ function SignUp() {
   const [dob, setDob] = useState(new Date());
 
   const uploadProfileImage = async (file, userUid) => {
+    if (!file || !userUid) {
+      console.log("Invalid parameters passed");
+    }
+
     const storage = getStorage();
     const storageRef = ref(storage, `profile_images/${userUid}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
@@ -72,7 +76,7 @@ function SignUp() {
 
   useEffect(() => {
     if (!loading) {
-      if (user) {
+      if (user && user.emailVerified) {
         router.push("/");
       }
     }
@@ -130,10 +134,7 @@ function SignUp() {
   const [imageError, setImageError] = useState(false);
   const [signupError, setSignupError] = useState(false);
   const [signupModal, setSignupModal] = useState(false);
-  ///////////////////////////////////////////////////////////////////////////////
-  // const [verificationAlert, setVerificationAlert] = useState(false);
-  // const [verificationAlertModal, setVerificationAlertModal] = useState(false);
-  ///////////////////////////////////////////////////////////////////////////////
+  const [verificationAlertModal, setVerificationAlertModal] = useState(false);
 
   const calculateAge = (dob) => {
     const today = new Date();
@@ -145,6 +146,12 @@ function SignUp() {
       age -= 1;
     }
     return age;
+  };
+
+  // for handling email verification modal
+  const closeVerificationAlertModal = () => {
+    setVerificationAlertModal(false);
+    router.push("/auth/login");
   };
 
   const handleSignUp = (e) => {
@@ -247,13 +254,18 @@ function SignUp() {
         await updateProfile(user, { displayName });
 
         let photoURL = "";
-        if (profileImage) {
-          photoURL = await uploadProfileImage(profileImage, user.uid);
+        if (profileImage && user.uid) {
+          try {
+            photoURL = await uploadProfileImage(profileImage, user.uid);
+          } catch (error) {
+            console.error("Error while uploading the profile image", error);
+          }
         } else {
           photoURL = "/user.png";
         }
 
         await signOut(auth);
+        setVerificationAlertModal(true);
 
         try {
           await setDoc(doc(db, "users", user.uid), {
@@ -267,10 +279,6 @@ function SignUp() {
             recentTracks: [],
           });
           console.log("The above code got fired?");
-          // ///////////////////////////////////////////////////////////////////
-          // setVerificationAlert(true);
-          // setVerificationAlertModal(true);
-          // ///////////////////////////////////////////////////////////////////
         } catch (error) {
           console.error("Error while saving user data to Firestore:", error);
         }
@@ -303,6 +311,7 @@ function SignUp() {
             setSignupError(
               "An unexpected error occurred. Please try again later."
             );
+            console.log(error);
         }
         setSignupModal(true);
       });
@@ -627,7 +636,7 @@ function SignUp() {
           </div>
         </div>
       )}
-      {/* {verificationAlert && verificationAlertModal && (
+      {verificationAlertModal && (
         <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
           <div className="fixed inset-0 transition-opacity">
             <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
@@ -641,9 +650,9 @@ function SignUp() {
                 </h3>
                 <div className="mt-2">
                   <div className="text-sm text-gray-500">
-                    Upon a successful sign-up, you will receive a verification
-                    email. Click the link to get started and listen to some
-                    bangers!
+                    Get ready! A verification email is coming your way. Click
+                    the link to unlock endless bangers and dive into the
+                    ultimate music experience!
                   </div>
                 </div>
               </div>
@@ -653,17 +662,14 @@ function SignUp() {
               <button
                 type="button"
                 className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-pink-600 rounded-md shadow-sm hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 sm:w-auto sm:text-sm"
-                onClick={() => {
-                  setVerificationAlertModal(false);
-                  verificationAlert(false);
-                }}
+                onClick={closeVerificationAlertModal}
               >
                 Close
               </button>
             </div>
           </div>
         </div>
-      )} */}
+      )}
     </>
   );
 }
