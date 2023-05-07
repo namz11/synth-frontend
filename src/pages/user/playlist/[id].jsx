@@ -14,12 +14,14 @@ function UserPlaylist() {
 
   const [user, loading] = useAuthState(auth);
 
-  const [playlistData, setPlaylistData] = useState(null);
-  const [tracksData, setTracksData] = useState(null);
   const [loader, setLoading] = useState(true);
   const [token, setToken] = useState(null);
-  const { setFullPlaylistData, setFullTracksData } =
-    useContext(PlaylistContext);
+  const {
+    setFullPlaylistData,
+    setFullTracksData,
+    fullPlaylistData,
+    fullTracksData,
+  } = useContext(PlaylistContext);
 
   useEffect(() => {
     const logToken = async () => {
@@ -36,7 +38,7 @@ function UserPlaylist() {
             Authorization: `Bearer ${theToken}`,
           },
         });
-        setPlaylistData(data);
+
         setFullPlaylistData(data);
 
         if (data) {
@@ -50,7 +52,7 @@ function UserPlaylist() {
               return response.data.data;
             })
           );
-          setTracksData(trackDataArray);
+
           setFullTracksData(trackDataArray);
         }
         setToken(theToken);
@@ -80,13 +82,8 @@ function UserPlaylist() {
     return (
       <>
         <MainLayout>
-          {playlistData && tracksData && (
-            <PlaylistFromUser
-              playlistData={playlistData}
-              tracksData={tracksData}
-              playlistId={id}
-              token={token}
-            />
+          {fullPlaylistData && fullTracksData && (
+            <PlaylistFromUser playlistId={id} token={token} />
           )}
         </MainLayout>
       </>
