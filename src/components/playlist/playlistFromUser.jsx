@@ -7,7 +7,7 @@ import { PlayerContext } from "@context/PlayerContext";
 import { spotifyApi } from "react-spotify-web-playback";
 import { PlaylistContext } from "@context/PlaylistContext";
 
-function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
+function PlaylistFromUser({ playlistId, token }) {
   const router = useRouter();
   const [resultModal, setResultModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -60,6 +60,14 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
 
     if (newName.length > 40) {
       setResultResponse("Playlist name cannot exceed 40 characters.");
+      setNameModal(false);
+      setNewName(null);
+      setResultModal(true);
+      return;
+    }
+
+    if (newName === originalName) {
+      setResultResponse("Playlist name is unchanged. No updates were made.");
       setNameModal(false);
       setNewName(null);
       setResultModal(true);
@@ -121,22 +129,6 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
         <div className="h-1/4 container mx-auto py-8 flex flex-wrap">
           <div className="w-3/10 flex items-center justify-center px-10 lg:px-4 mx-auto md:mx-0">
             <div className="shrink-0 w-48 overflow-hidden bg-transparent">
-              {/* {!tracksData ? (
-                <div className="bg-gray-800 w-full h-48 opacity-70"></div>
-              ) : (
-                <div className="flex flex-row flex-wrap justify-start content-start">
-                  {tracksData.slice(0, 4).map((track, index) => (
-                    <img
-                      key={index}
-                      className="object-cover w-24 h-24"
-                      src={
-                        track.album.images[0] ? track.album.images[0].url : ""
-                      }
-                      alt="playlist image"
-                    />
-                  ))}
-                </div>
-              )} */}
               {!fullTracksData ? (
                 <div className="bg-gray-800 w-full h-48 opacity-70"></div>
               ) : (
@@ -153,7 +145,7 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
                   ))}
 
                   {Array.from({
-                    length: Math.max(4 - (tracksData.length || 0), 0),
+                    length: Math.max(4 - (fullTracksData.length || 0), 0),
                   }).map((_, index) => (
                     <div
                       key={index}
@@ -171,16 +163,17 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
             <p className="text-4xl lg:text-7xl font-bold mb-2">
               {newName || fullPlaylistData.data.name}
             </p>
-            {playlistData.data.tracks !== [] && playlistData.data.userId && (
-              <p className="text-pink-500 text-lg lg:text-2xl font-regular">
-                {/* {playlistData.data.userId.toUpperCase()} &bull;{" "} */}
-                {fullPlaylistData.data.tracks.length === 1 ? (
-                  <span>{`${fullPlaylistData.data.tracks.length} Track`}</span>
-                ) : (
-                  <span>{`${fullPlaylistData.data.tracks.length} Tracks`}</span>
-                )}
-              </p>
-            )}
+            {fullPlaylistData.data.tracks !== [] &&
+              fullPlaylistData.data.userId && (
+                <p className="text-pink-500 text-lg lg:text-2xl font-regular">
+                  {/* {fullPlaylistData.data.userId.toUpperCase()} &bull;{" "} */}
+                  {fullPlaylistData.data.tracks.length === 1 ? (
+                    <span>{`${fullPlaylistData.data.tracks.length} Track`}</span>
+                  ) : (
+                    <span>{`${fullPlaylistData.data.tracks.length} Tracks`}</span>
+                  )}
+                </p>
+              )}
             <div className="flex gap-4 mt-2">
               <button
                 className="cursor-pointer text-white font-medium text-sm lg:text-md py-1 px-4 lg:py-2 bg-pink-600 rounded-3xl"
@@ -218,7 +211,7 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
             </div>
           )}
           <TrackListForPlaylist
-            tracks={tracksData}
+            // tracks={tracksData}
             playlistId={playlistId}
             token={token}
           />
@@ -234,7 +227,7 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
           <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
             <div className="text-center">
               <div className="mt-4">
-                <div className="text-lg font-medium text-gray-900">{`Track ${resultResponse}`}</div>
+                <div className="text-lg font-medium text-gray-900">{`${resultResponse}`}</div>
               </div>
             </div>
 
@@ -293,8 +286,8 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
                   <input
                     type="text"
                     className="mt-4 p-2 border border-gray-300 rounded-md w-full"
-                    placeholder="Playlist Name..."
-                    value={newName || originalName}
+                    placeholder={originalName}
+                    value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     aria-label="New Playlist Name Input"
                   />

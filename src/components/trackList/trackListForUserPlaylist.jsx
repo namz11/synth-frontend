@@ -8,7 +8,7 @@ import { PlayerContext } from "@context/PlayerContext";
 import { BsFillPlayFill } from "react-icons/bs";
 import { PlaylistContext } from "@context/PlaylistContext";
 
-function TrackListForUserPlaylist({ tracks, playlistId, token }) {
+function TrackListForUserPlaylist({ playlistId, token }) {
   const [resultModal, setResultModal] = useState(false);
   const [resultResponse, setResultResponse] = useState(false);
   const {
@@ -19,9 +19,8 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
   } = useContext(PlaylistContext);
   const [currentTracks, setCurrentTracks] = useState([]);
   const [hoveredIndex, setHoveredIndex] = useState(-1);
-  const [deletedTrackId, setDeletedTrackId] = useState(null);
 
-  // const [deviceId, setDeviceId] = useContext(PlayerContext);
+  const [deviceId, setDeviceId] = useContext(PlayerContext);
   useEffect(() => {
     setCurrentTracks(fullTracksData);
   }, [fullTracksData]);
