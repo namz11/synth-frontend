@@ -97,85 +97,6 @@ function TopTrackForPlaylist({ tracks, token }) {
 
   return (
     <>
-      {/* <div className="container mx-auto text-white mt-4">
-        {tracks.map((track, index) => (
-          <div
-            key={track.id}
-            className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer"
-          >
-            <Link href={`#_`}>
-              <div className="mr-5 text-white">{index + 1}</div>
-            </Link>
-
-            <div className="hidden md:block">
-              <Link href={`#_`}>
-                <Image
-                  className="object-cover mr-4"
-                  src={
-                    track.track.album.images[1].url ||
-                    "https://faculty.eng.ufl.edu/fluids/wp-content/uploads/sites/46/2015/11/img-placeholder-270x300.png"
-                  }
-                  alt="Track Cover"
-                  width={70}
-                  height={70}
-                />
-              </Link>
-            </div>
-
-            <div className="flex-grow">
-              <Link href={`#_`}>
-                <div className="font-medium text-xl text-white text-overflow:text-ellipsis hover:underline max-w-[23ch] lg:max-w-[42ch] md:max-w-[32ch] ">
-                  {track.track.name}
-                </div>
-              </Link>
-              <div className="text-gray-400 flex flex-wrap">
-                {track.track.artists.map((artist, index) => (
-                  <React.Fragment key={artist.id}>
-                    <Link href={`/artist/${artist.id}`}>
-                      <div className="text-pink-500 text-lg hover:underline">
-                        {artist.name}
-                      </div>
-                    </Link>
-                    {index !== track.track.artists.length - 1 && (
-                      <span className="text-pink-500">,&nbsp;</span>
-                    )}
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
-
-            <div className="hidden lg:block">
-              <Link href={`/album/${track.track.album.id}`}>
-                <div className="text-blue-300 hover:underline mr-28">
-                  {track.track.album.name}
-                </div>
-              </Link>
-            </div>
-
-            <div className="text-gray-400">
-              {formatDuration(track.track.duration_ms)}
-            </div>
-            <div
-              className="text-gray-400 ml-5"
-              onClick={() => handlePlayerAdd([track.track.uri])}
-            >
-              Listen to this song!
-            </div>
-            <div
-              className="text-blue-300 z-10 ml-5 cursor-pointer"
-              onClick={() =>
-                handleAddToPlaylistClick(
-                  track.track.id,
-                  track.track.album.images
-                )
-              }
-            >
-              <RiPlayListAddLine className="text-xl lg:text-2xl" />
-            </div>
-          </div>
-        ))}
-      </div> */}
-
       <div className="container mx-auto text-white mt-4">
         {tracks.map((track, index) => {
           return (
@@ -238,22 +159,27 @@ function TopTrackForPlaylist({ tracks, token }) {
                   {track.track?.name || "Track Unavailable"}
                 </div>
 
-                {track?.track?.artists && track?.track?.artists.length > 0 && (
-                  <div className="text-gray-400 flex flex-wrap">
-                    {track.track.artists.map((artist, index) => (
-                      <React.Fragment key={artist.id}>
-                        <Link href={`/artist/${artist.id}`}>
-                          <div className="text-pink-500 text-lg hover:underline">
-                            {artist.name}
-                          </div>
-                        </Link>
-                        {index !== track.track.artists.length - 1 && (
-                          <span className="text-pink-500">,&nbsp;</span>
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                )}
+                {track?.track?.artists &&
+                  track?.track?.artists?.length >= 1 && (
+                    <div className="text-gray-400 flex flex-wrap">
+                      {track.track.artists.map((artist, index) => (
+                        <React.Fragment key={artist?.id}>
+                          {artist?.id && artist?.name && (
+                            <>
+                              {index > 0 && (
+                                <span className="text-pink-500">,&nbsp;</span>
+                              )}
+                              <Link href={`/artist/${artist.id}`}>
+                                <div className="text-pink-500 text-lg hover:underline">
+                                  {artist.name}
+                                </div>
+                              </Link>
+                            </>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  )}
               </div>
 
               {track?.track?.album?.id && track?.track?.album?.name && (

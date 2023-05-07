@@ -131,24 +131,26 @@ function TrackList({ tracks, token }) {
                 {track?.name || "Track Unavailable"}
               </div>
 
-              <div className="text-gray-400 flex flex-wrap">
-                {track.artists && track.artists.length > 0 && (
-                  <>
-                    {track.artists.map((artist, index) => (
-                      <React.Fragment key={artist.id}>
-                        <Link href={`/artist/${artist.id}`}>
-                          <div className="text-pink-500 text-lg hover:underline">
-                            {artist.name}
-                          </div>
-                        </Link>
-                        {index !== track.artists.length - 1 && (
-                          <span className="text-pink-500">,&nbsp;</span>
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </>
-                )}
-              </div>
+              {track?.artists && track?.artists?.length >= 1 && (
+                <div className="text-gray-400 flex flex-wrap">
+                  {track.artists.map((artist, index) => (
+                    <React.Fragment key={artist?.id}>
+                      {artist?.id && artist?.name && (
+                        <>
+                          {index > 0 && (
+                            <span className="text-pink-500">,&nbsp;</span>
+                          )}
+                          <Link href={`/artist/${artist.id}`}>
+                            <div className="text-pink-500 text-lg hover:underline">
+                              {artist.name}
+                            </div>
+                          </Link>
+                        </>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="text-gray-400">
               {track.duration_ms ? formatDuration(track.duration_ms) : ""}
