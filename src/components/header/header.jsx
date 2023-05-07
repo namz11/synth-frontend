@@ -42,7 +42,7 @@ const Header = () => {
     if (searchTerm.trim() !== "") {
       router.push(`/search?query=${searchTerm}`);
     }
-  }, [searchTerm]);
+  }, [router, searchTerm]);
 
   const logInRedirect = () => {
     console.log("PLEASE LOGIN");
@@ -84,7 +84,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           <Link href="/">
             <span className="text-2xl font-bold text-gray-800 transition-colors duration-300 transform dark:text-white lg:text-3xl hover:text-gray-700 dark:hover:text-gray-300">
-              Synth
+              <img src="/Logo.svg" width={56} height={56} alt="logo" />
             </span>
           </Link>
 
