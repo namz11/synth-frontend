@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Head from "next/head";
 import "@styles/globals.css";
 import { AuthContextProvider } from "@context/AuthContext";
-import MusicPlayer from "@components/player/musicPlayer";
 import { PlayerContextProvider } from "@context/PlayerContext";
 import { PlaylistProvider } from "@context/PlaylistContext";
 
@@ -21,7 +20,6 @@ const App = ({ Component, pageProps }) => {
         <PlayerContextProvider>
           <PlaylistProvider>
             <Component {...pageProps} />
-            <MusicPlayer />
           </PlaylistProvider>
         </PlayerContextProvider>
       </AuthContextProvider>

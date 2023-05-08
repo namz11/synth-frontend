@@ -74,7 +74,7 @@ function MusicPlayer() {
 
   return (
     user && (
-      <div className="fixed bottom-0 z-40 w-full">
+      <div className="fixed bottom-12 z-40 w-full">
         <SpotifyPlayer
           name="Synth Music Player"
           token={token}
@@ -95,7 +95,7 @@ function MusicPlayer() {
             }
           }}
           styles={{
-            bgColor: "#1f2937",
+            bgColor: "#1e293b",
             color: "#fff",
             loaderColor: "#fff",
             sliderColor: "#EC4899",
