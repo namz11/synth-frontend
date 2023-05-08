@@ -42,7 +42,7 @@ const Header = () => {
     if (searchTerm.trim() !== "") {
       router.push(`/search?query=${searchTerm}`);
     }
-  }, [router, searchTerm]);
+  }, [searchTerm]);
 
   useEffect(() => {
     const fetchUserData = async (uid) => {
