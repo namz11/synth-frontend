@@ -14,11 +14,17 @@ const Scroller = ({ title, tagline, items, isTracks, token }) => {
         <div className="overflow-x-scroll mt-3 flex flex-row justify-start items-center space-x-5 flex-nowrap">
           {items &&
             items.length > 0 &&
-            items.map((item) => {
+            items.map((item, idx) => {
               if (isTracks) {
-                return <TrackTile key={item?.id} data={item} token={token} />;
+                return (
+                  <TrackTile
+                    key={`${idx}_${item?.id}`}
+                    data={item}
+                    token={token}
+                  />
+                );
               } else {
-                return <PlaylistTile key={item?.id} data={item} />;
+                return <PlaylistTile key={`${idx}_${item?.id}`} data={item} />;
               }
             })}
         </div>

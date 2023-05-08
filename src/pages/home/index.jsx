@@ -114,9 +114,9 @@ const Home = () => {
         )}
         {categoryPlaylists &&
           categoryPlaylists?.length > 0 &&
-          categoryPlaylists.map((item) => (
+          categoryPlaylists.map((item, idx) => (
             <Scroller
-              key={item.title}
+              key={`scroller_${idx}_${item?.id}`}
               title={item?.title}
               tagline={item?.message}
               items={item?.playlists?.items || []}
