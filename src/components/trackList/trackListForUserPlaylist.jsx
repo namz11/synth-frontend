@@ -1,17 +1,29 @@
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { MdDelete } from "react-icons/md";
 import { spotifyApi } from "react-spotify-web-playback";
 import { PlayerContext } from "@context/PlayerContext";
+import { BsFillPlayFill } from "react-icons/bs";
+import { PlaylistContext } from "@context/PlaylistContext";
 
-function TrackListForUserPlaylist({ tracks, playlistId, token }) {
+function TrackListForUserPlaylist({ playlistId, token }) {
   const [resultModal, setResultModal] = useState(false);
   const [resultResponse, setResultResponse] = useState(false);
-  const [currentTracks, setCurrentTracks] = useState(tracks);
+  const {
+    setFullPlaylistData,
+    fullPlaylistData,
+    fullTracksData,
+    setFullTracksData,
+  } = useContext(PlaylistContext);
+  const [currentTracks, setCurrentTracks] = useState([]);
+  const [hoveredIndex, setHoveredIndex] = useState(-1);
 
   const [deviceId, setDeviceId] = useContext(PlayerContext);
+  useEffect(() => {
+    setCurrentTracks(fullTracksData);
+  }, [fullTracksData]);
 
   function formatDuration(duration_ms) {
     const seconds = Math.floor((duration_ms / 1000) % 60);
@@ -32,9 +44,31 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
       })
       .then((response) => {
         setResultResponse(response.data.message);
-        setCurrentTracks((prevTracks) =>
-          prevTracks.filter((track) => track.id !== trackId)
+        // setCurrentTracks((prevTracks) =>
+        //   prevTracks.filter((track) => track.id !== trackId)
+        // );
+        setCurrentTracks((prevTracks) => {
+          const updatedTracks = prevTracks.filter(
+            (track) => track.id !== trackId
+          );
+
+          // Update the fullTracksData in the context
+          setFullTracksData(updatedTracks);
+
+          return updatedTracks;
+        });
+
+        const updatedTracks = fullPlaylistData.data.tracks.filter(
+          (track) => track !== trackId
         );
+        const updatedFullPlaylistData = {
+          ...fullPlaylistData,
+          data: {
+            ...fullPlaylistData.data,
+            tracks: updatedTracks,
+          },
+        };
+        setFullPlaylistData(updatedFullPlaylistData);
       })
       .catch((error) => {
         console.error(error);
@@ -56,7 +90,6 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
     spotifyToken = spotifyToken.data.token;
 
     // Get the device id of the spotify player from context.
-    console.log(trackUriList);
     await spotifyApi.play(spotifyToken, {
       uris: trackUriList,
       deviceId: deviceId,
@@ -65,21 +98,32 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
 
   return (
     <>
-      <div className="container mx-auto text-white mt-4">
+      <div className="container mx-auto text-white mt-4 mb-6">
         {currentTracks.map((track, index) => (
           <div
             key={track.id}
             className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer"
+            onMouseEnter={() => setHoveredIndex(index)}
+            onMouseLeave={() => setHoveredIndex(-1)}
           >
-            <span
-              className="mr-5 text-white"
-              onClick={
-                track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
-              }
-            >
-              {index + 1}
-            </span>
-
+            {hoveredIndex === index ? (
+              <BsFillPlayFill
+                className="mr-2 text-2xl text-white"
+                onClick={
+                  track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
+                }
+                aria-label="Play Track"
+              />
+            ) : (
+              <span
+                className="mr-5 text-md lg:text-xl text-white"
+                onClick={
+                  track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
+                }
+              >
+                {index + 1}
+              </span>
+            )}
             <div className="hidden md:block">
               <Image
                 className="object-cover mr-4"
@@ -106,17 +150,21 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
                 {track.name || "Track Unavailable"}
               </div>
 
-              {track.artists && track.artists.length > 0 && (
+              {track?.artists && track?.artists?.length >= 1 && (
                 <div className="text-gray-400 flex flex-wrap">
                   {track.artists.map((artist, index) => (
-                    <React.Fragment key={artist.id}>
-                      <Link href={`/artist/${artist.id}`}>
-                        <div className="text-pink-500 hover:underline">
-                          {artist.name || "Artist Unavailable"}
-                        </div>
-                      </Link>
-                      {index !== track.artists.length - 1 && (
-                        <span className="text-pink-500">,&nbsp;</span>
+                    <React.Fragment key={artist?.id}>
+                      {artist?.id && artist?.name && (
+                        <>
+                          {index > 0 && (
+                            <span className="text-pink-500">,&nbsp;</span>
+                          )}
+                          <Link href={`/artist/${artist.id}`}>
+                            <div className="text-pink-500 text-lg hover:underline">
+                              {artist.name}
+                            </div>
+                          </Link>
+                        </>
                       )}
                     </React.Fragment>
                   ))}
@@ -143,8 +191,12 @@ function TrackListForUserPlaylist({ tracks, playlistId, token }) {
                 <div
                   className="text-pink-500 z-10 ml-5 cursor-pointer"
                   onClick={() => handleDeleteTrackClick(track.id, token)}
+                  title="Remove From Playlist"
                 >
-                  <MdDelete className="text-xl lg:text-2xl" />
+                  <MdDelete
+                    className="text-xl lg:text-2xl"
+                    aria-label="Remove From Playlist"
+                  />
                 </div>
               )}
             </div>

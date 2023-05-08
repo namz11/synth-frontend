@@ -5,11 +5,14 @@ import React, { useState, useEffect, useContext } from "react";
 import { RiPlayListAddLine } from "react-icons/ri";
 import { spotifyApi } from "react-spotify-web-playback";
 import { PlayerContext } from "@context/PlayerContext";
+import { BsFillPlayFill } from "react-icons/bs";
 
 function TopTrackForArtist({ topTracks, token }) {
   const [showModal, setShowModal] = useState(false);
   const [selectedTrackId, setSelectedTrackId] = useState(null);
   const [userPlaylists, setUserPlaylists] = useState(null);
+
+  const [hoveredIndex, setHoveredIndex] = useState(-1);
 
   const [resultModal, setResultModal] = useState(false);
   const [resultResponse, setResultResponse] = useState(false);
@@ -59,7 +62,6 @@ function TopTrackForArtist({ topTracks, token }) {
         )
         .then((response) => {
           // Navigate
-          // console.log(response.data);
           setResultResponse(response.data.message);
         })
         .catch((error) => {
@@ -98,15 +100,27 @@ function TopTrackForArtist({ topTracks, token }) {
           <div
             key={track.id}
             className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer"
+            onMouseEnter={() => setHoveredIndex(index)}
+            onMouseLeave={() => setHoveredIndex(-1)}
           >
-            <span
-              className="mr-5 text-white"
-              onClick={
-                track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
-              }
-            >
-              {index + 1}
-            </span>
+            {hoveredIndex === index ? (
+              <BsFillPlayFill
+                className="mr-2 text-2xl text-white"
+                onClick={
+                  track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
+                }
+                aria-label="Play Track"
+              />
+            ) : (
+              <span
+                className="mr-5 text-md lg:text-xl text-white"
+                onClick={
+                  track?.uri ? () => handlePlayerAdd([track.uri]) : undefined
+                }
+              >
+                {index + 1}
+              </span>
+            )}
 
             <div className="hidden md:block">
               <Image
@@ -129,20 +143,26 @@ function TopTrackForArtist({ topTracks, token }) {
                 {track.name}
               </div>
 
-              <div className="text-gray-400 flex flex-wrap">
-                {track.artists.map((artist, index) => (
-                  <React.Fragment key={artist.id}>
-                    <Link href={`/artist/${artist.id}`}>
-                      <div className="text-pink-500 text-lg hover:underline">
-                        {artist.name}
-                      </div>
-                    </Link>
-                    {index !== track.artists.length - 1 && (
-                      <span className="text-pink-500">,&nbsp;</span>
-                    )}
-                  </React.Fragment>
-                ))}
-              </div>
+              {track?.artists && track?.artists?.length >= 1 && (
+                <div className="text-gray-400 flex flex-wrap">
+                  {track.artists.map((artist, index) => (
+                    <React.Fragment key={artist?.id}>
+                      {artist?.id && artist?.name && (
+                        <>
+                          {index > 0 && (
+                            <span className="text-pink-500">,&nbsp;</span>
+                          )}
+                          <Link href={`/artist/${artist.id}`}>
+                            <div className="text-pink-500 text-lg hover:underline">
+                              {artist.name}
+                            </div>
+                          </Link>
+                        </>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="hidden lg:block">
@@ -160,8 +180,12 @@ function TopTrackForArtist({ topTracks, token }) {
             <div
               className="text-blue-300 z-10 ml-5 cursor-pointer"
               onClick={() => handleAddToPlaylistClick(track.id)}
+              title="Add to Playlist"
             >
-              <RiPlayListAddLine className="text-xl lg:text-2xl" />
+              <RiPlayListAddLine
+                className="text-xl lg:text-2xl"
+                aria-label="Add To Playlist Button"
+              />
             </div>
           </div>
         ))}

@@ -38,7 +38,6 @@ const MyPlaylists = () => {
           },
         }
       );
-      console.log(data);
       if (data?.success) {
         setIsOpen(false);
         fetchUserPlaylists(token);
@@ -58,7 +57,6 @@ const MyPlaylists = () => {
         Authorization: `Bearer ${theToken}`,
       },
     });
-    console.log("user playlists", data);
     setUserPlaylists(data?.items);
   }
 
@@ -137,14 +135,17 @@ const MyPlaylists = () => {
                     <div>
                       <div className="text-center">
                         <Dialog.Title
-                          as="h3"
+                          as="h1"
                           className="text-base font-semibold leading-6 text-gray-100"
                         >
                           Create a playlist
                         </Dialog.Title>
                         <div className="mt-2">
                           <div>
-                            <label htmlFor="name" className="sr-only">
+                            <label
+                              htmlFor="name"
+                              className="sr-only text-gray-200"
+                            >
                               Name
                             </label>
                             <input

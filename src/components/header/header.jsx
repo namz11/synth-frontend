@@ -24,7 +24,6 @@ const Header = () => {
     const auth = getAuth();
     signOut(auth)
       .then(() => {
-        console.log("Successfully Logged Out!");
         dispatch({ type: "LOGOUT" });
         router.push("/auth/login");
       })
@@ -42,10 +41,9 @@ const Header = () => {
     if (searchTerm.trim() !== "") {
       router.push(`/search?query=${searchTerm}`);
     }
-  }, [searchTerm]);
+  }, [router, searchTerm]);
 
   const logInRedirect = () => {
-    console.log("PLEASE LOGIN");
     router.push("/auth/login");
   };
 
@@ -84,7 +82,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           <Link href="/">
             <span className="text-2xl font-bold text-gray-800 transition-colors duration-300 transform dark:text-white lg:text-3xl hover:text-gray-700 dark:hover:text-gray-300">
-              Synth
+              <img src="/Logo.svg" width={56} height={56} alt="logo" />
             </span>
           </Link>
 
@@ -104,11 +102,13 @@ const Header = () => {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                   strokeWidth="2"
+                  aria-label="Open Menu Button"
                 >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     d="M4 8h16M4 16h16"
+                    aria-label="Open Menu Button"
                   />
                 </svg>
               )}
@@ -121,11 +121,13 @@ const Header = () => {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                   strokeWidth="2"
+                  aria-label="Close Menu Button"
                 >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     d="M6 18L18 6M6 6l12 12"
+                    aria-label="Close Menu Button"
                   />
                 </svg>
               )}
@@ -164,6 +166,7 @@ const Header = () => {
                 className="w-5 h-5 text-gray-400"
                 viewBox="0 0 24 24"
                 fill="none"
+                aria-label="Search Bar Icon"
               >
                 <path
                   d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
@@ -171,6 +174,7 @@ const Header = () => {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  aria-label="Search Bar Icon"
                 ></path>
               </svg>
             </span>
@@ -183,6 +187,7 @@ const Header = () => {
               value={searchTerm}
               onChange={(e) => handleSearchChange(e)}
               onClick={() => router.push("/search")} // Add this line
+              aria-label="Search Bar"
             />
           </div>
 
@@ -192,7 +197,7 @@ const Header = () => {
               aria-label="show notifications"
               onClick={handleLogout}
             >
-              <FiLogOut />
+              <FiLogOut aria-label="Logout" />
             </button>
 
             <button
@@ -211,7 +216,7 @@ const Header = () => {
                 <img
                   src={photoURL || "/user.png"}
                   className="object-cover w-full h-full"
-                  alt="avatar"
+                  alt="Profile avatar and page button"
                 />
               </div>
             </button>
@@ -350,7 +355,7 @@ const Header = () => {
                 <img
                   src={photoURL || "/user.png"}
                   className="object-cover w-full h-full"
-                  alt="avatar"
+                  alt="Profile avatar and page button"
                 />
               </div>
             </button>

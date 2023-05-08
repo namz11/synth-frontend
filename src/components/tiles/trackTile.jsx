@@ -11,7 +11,6 @@ const TrackTile = ({ data, token }) => {
 
   async function handlePlayerAdd(trackUriList, token) {
     let spotifyToken;
-    console.log(token);
     const getSpotifyToken = async () => {
       spotifyToken = await axios(`/api/token`, {
         headers: {
@@ -23,7 +22,6 @@ const TrackTile = ({ data, token }) => {
     spotifyToken = spotifyToken.data.token;
 
     // Get the device id of the spotify player from context.
-    console.log(trackUriList);
     await spotifyApi.play(spotifyToken, {
       uris: trackUriList,
       deviceId: deviceId,
@@ -58,12 +56,16 @@ const TrackTile = ({ data, token }) => {
             </span>
           </div>
           <div className="absolute bottom-0 left-0 right-0 top-0 h-48 w-48 overflow-hidden bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-0 transition duration-300 ease-in-out hover:opacity-80">
-            <div className="text-3xl text-white text-center flex justify-center align-center items-center w-full h-full">
+            <div
+              className="text-3xl text-white text-center flex justify-center align-center items-center w-full h-full"
+              aria-label="Play Song"
+            >
               <button
                 onClick={() => handlePlayerAdd([data.uri], token)}
                 type="button"
+                aria-label="Play Song Button"
               >
-                <FaPlay />
+                <FaPlay aria-label="Play Song Button" />
               </button>
             </div>
           </div>

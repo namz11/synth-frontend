@@ -8,6 +8,7 @@ import AlbumComponent from "@components/album/album";
 import { AuthContext } from "@context/AuthContext";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, signIn } from "@utils/firebase";
+import Loader from "@components/loader/loader";
 
 const Album = () => {
   const router = useRouter();
@@ -58,7 +59,9 @@ const Album = () => {
   if (loader) {
     return (
       <>
-        <div>Loading</div>
+        <MainLayout>
+          <Loader />
+        </MainLayout>
       </>
     );
   } else {

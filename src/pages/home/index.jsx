@@ -18,12 +18,14 @@ const Home = () => {
   // #FIREBASEAUTH For checking if the user is logged in, the session is active and if the seesion is loading
   const [user, loading] = useAuthState(auth);
   const { currentUser } = useContext(AuthContext);
+  const [tok, setTok] = useState(null);
 
   useEffect(() => {
     // #FIREBASEAUTH async function for getting the value of token before making api call and passing the token as the header
     const logToken = async () => {
       if (user) {
         const token = await user.getIdToken();
+        setTok(token);
         return token;
       }
     };
@@ -35,7 +37,6 @@ const Home = () => {
           Authorization: `Bearer ${theToken}`,
         },
       });
-      console.log("recent", data);
       setRecentTracks(data?.items);
     }
     async function fetchMostPlayed(theToken) {
@@ -44,7 +45,6 @@ const Home = () => {
           Authorization: `Bearer ${theToken}`,
         },
       });
-      console.log("most-played", data);
       setMostPlayed(data?.items);
     }
     async function fetchFeaturedPlaylists(theToken) {
@@ -53,7 +53,6 @@ const Home = () => {
           Authorization: `Bearer ${theToken}`,
         },
       });
-      console.log("featured", data);
       setFeaturedPlaylist(data);
     }
     async function fetchCategoryPlaylists(theToken) {
@@ -62,7 +61,6 @@ const Home = () => {
           Authorization: `Bearer ${theToken}`,
         },
       });
-      console.log("category", data);
       setCategoryPlaylists(data);
     }
 
@@ -93,6 +91,7 @@ const Home = () => {
             title={"Listen Again"}
             items={mostPlayed || []}
             isTracks={true}
+            token={tok}
           />
         )}
         {recentTracks && recentTracks?.length > 0 && (
@@ -100,6 +99,7 @@ const Home = () => {
             title={"Recently Played"}
             items={recentTracks || []}
             isTracks={true}
+            token={tok}
           />
         )}
         {featuredPlaylist && (

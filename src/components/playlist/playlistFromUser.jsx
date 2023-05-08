@@ -1,18 +1,27 @@
 // import Image from "next/image";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import TrackListForPlaylist from "@components/trackList/trackListForUserPlaylist";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { PlayerContext } from "@context/PlayerContext";
 import { spotifyApi } from "react-spotify-web-playback";
+import { PlaylistContext } from "@context/PlaylistContext";
 
-function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
+function PlaylistFromUser({ playlistId, token }) {
   const router = useRouter();
   const [resultModal, setResultModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
   const [resultResponse, setResultResponse] = useState(false);
   const [nameModal, setNameModal] = useState(false);
   const [newName, setNewName] = useState("");
   const [deviceId, setDeviceId] = useContext(PlayerContext);
+  const [originalName, setOriginalName] = useState(null);
+
+  const { fullPlaylistData, fullTracksData } = useContext(PlaylistContext);
+
+  useEffect(() => {
+    setOriginalName(fullPlaylistData.data.name);
+  }, [fullPlaylistData.data.name]);
 
   function handleDeletePlaylist() {
     const url = `/api/user/playlists/${playlistId}`;
@@ -23,13 +32,13 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
         },
       })
       .then((response) => {
-        setResultResponse(response.data.message);
+        setResultResponse(`${response.data.message}`);
       })
       .catch((error) => {
         console.error(error);
         setResultResponse(error.message);
       });
-    setResultModal(true);
+    setDeleteModal(true);
   }
 
   const openModal = () => {
@@ -41,7 +50,30 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
   };
 
   const handleUpdateName = () => {
-    console.log("New name:", newName);
+    if (!newName || newName.trim() === "") {
+      setResultResponse("Playlist name cannot be empty.");
+      setNameModal(false);
+      setNewName(null);
+      setResultModal(true);
+      return;
+    }
+
+    if (newName.length > 40) {
+      setResultResponse("Playlist name cannot exceed 40 characters.");
+      setNameModal(false);
+      setNewName(null);
+      setResultModal(true);
+      return;
+    }
+
+    if (newName === originalName) {
+      setResultResponse("Playlist name is unchanged. No updates were made.");
+      setNameModal(false);
+      setNewName(null);
+      setResultModal(true);
+      return;
+    }
+
     const url = `/api/user/playlists/${playlistId}`;
     axios
       .put(
@@ -56,12 +88,19 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
         }
       )
       .then((response) => {
-        setResultResponse(response.data.message);
+        setNameModal(false);
+        setOriginalName(newName);
+        if (response.data.success) {
+          setResultResponse(`Playlist Name Updated to ${newName}`);
+          setResultModal(true);
+        }
       })
       .catch((error) => {
+        setNameModal(false);
+        setNewName(null);
         setResultResponse(error);
+        setResultModal(true);
       });
-    setNameModal(false);
   };
 
   // Play the track list on spotify player.
@@ -90,11 +129,11 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
         <div className="h-1/4 container mx-auto py-8 flex flex-wrap">
           <div className="w-3/10 flex items-center justify-center px-10 lg:px-4 mx-auto md:mx-0">
             <div className="shrink-0 w-48 overflow-hidden bg-transparent">
-              {!tracksData ? (
+              {!fullTracksData ? (
                 <div className="bg-gray-800 w-full h-48 opacity-70"></div>
               ) : (
                 <div className="flex flex-row flex-wrap justify-start content-start">
-                  {tracksData.slice(0, 4).map((track, index) => (
+                  {fullTracksData.slice(0, 4).map((track, index) => (
                     <img
                       key={index}
                       className="object-cover w-24 h-24"
@@ -102,6 +141,15 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
                         track.album.images[0] ? track.album.images[0].url : ""
                       }
                       alt="playlist image"
+                    />
+                  ))}
+
+                  {Array.from({
+                    length: Math.max(4 - (fullTracksData.length || 0), 0),
+                  }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="object-cover w-24 h-24 bg-gray-800 opacity-70" // Empty box styling
                     />
                   ))}
                 </div>
@@ -113,23 +161,28 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
               {`playlist`.toUpperCase()}
             </p>
             <p className="text-4xl lg:text-7xl font-bold mb-2">
-              {newName || playlistData.data.name}
+              {newName || fullPlaylistData.data.name}
             </p>
-            {playlistData.data.tracks !== [] && playlistData.data.userId && (
-              <p className="text-pink-500 text-lg lg:text-2xl font-regular">
-                {/* {playlistData.data.userId.toUpperCase()} &bull;{" "} */}
-                {playlistData.data.tracks.length} Tracks
-              </p>
-            )}
+            {fullPlaylistData.data.tracks !== [] &&
+              fullPlaylistData.data.userId && (
+                <p className="text-pink-500 text-lg lg:text-2xl font-regular">
+                  {/* {fullPlaylistData.data.userId.toUpperCase()} &bull;{" "} */}
+                  {fullPlaylistData.data.tracks.length === 1 ? (
+                    <span>{`${fullPlaylistData.data.tracks.length} Track`}</span>
+                  ) : (
+                    <span>{`${fullPlaylistData.data.tracks.length} Tracks`}</span>
+                  )}
+                </p>
+              )}
             <div className="flex gap-4 mt-2">
               <button
-                className="cursor-pointer text-white font-medium text-sm lg:text-md py-1 px-4 lg:py-2 bg-pink-500 rounded-3xl"
+                className="cursor-pointer text-white font-medium text-sm lg:text-md py-1 px-4 lg:py-2 bg-pink-600 rounded-3xl"
                 onClick={() => handleDeletePlaylist()}
               >
                 Delete Playlist
               </button>
               <button
-                className="cursor-pointer text-white font-medium text-sm lg:text-md py-1 px-4 lg:py-2 bg-pink-500 rounded-3xl"
+                className="cursor-pointer text-white font-medium text-sm lg:text-md py-1 px-4 lg:py-2 bg-pink-600 rounded-3xl"
                 onClick={() => {
                   openModal();
                 }}
@@ -143,20 +196,22 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
           <div className="text-3xl text-white font-semibold px-4 lg:px-0">
             Tracks
           </div>
-          <div
-            className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md py-4 hover:bg-gray-800 cursor-pointer mt-3"
-            onClick={() => {
-              let trackUriList = [];
-              tracksData.forEach((track) => {
-                trackUriList.push(track.uri);
-              });
-              handlePlayerAdd(trackUriList);
-            }}
-          >
-            Listen Now
-          </div>
+          {fullTracksData.length !== 0 && (
+            <div
+              className="text-2xl text-white font-semibold px-4 lg:px-0 rounded-md py-4 hover:bg-gray-800 cursor-pointer mt-3"
+              onClick={() => {
+                let trackUriList = [];
+                fullTracksData.forEach((track) => {
+                  trackUriList.push(track.uri);
+                });
+                handlePlayerAdd(trackUriList);
+              }}
+            >
+              Listen Now
+            </div>
+          )}
           <TrackListForPlaylist
-            tracks={tracksData}
+            // tracks={tracksData}
             playlistId={playlistId}
             token={token}
           />
@@ -164,90 +219,99 @@ function PlaylistFromUser({ playlistData, tracksData, playlistId, token }) {
       </div>
 
       {resultModal && resultResponse && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div
-              className="fixed inset-0 transition-opacity"
-              aria-hidden="true"
-            >
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+        <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
+            <div className="text-center">
+              <div className="mt-4">
+                <div className="text-lg font-medium text-gray-900">{`${resultResponse}`}</div>
+              </div>
             </div>
 
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full sm:max-w-md">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <div
-                      className="text-lg leading-6 font-medium text-gray-900"
-                      id="modal-title"
-                    >
-                      {`Track ${resultResponse}`}
-                    </div>
-                  </div>
-                </div>
+            <div className="mt-8 text-center">
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-pink-600 rounded-md shadow-sm hover:bg-pink-700 sm:w-auto sm:text-sm"
+                onClick={() => setResultModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteModal && resultResponse && (
+        <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl mb-28 rounded-lg sm:p-8">
+            <div className="text-center">
+              <div className="mt-4">
+                <div className="text-lg font-medium text-gray-900">{`Track ${resultResponse}`}</div>
               </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-600 text-base font-medium text-white hover:bg-pink-700 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={() => {
-                    setResultModal(false);
-                    router.push("/user/playlists");
-                  }}
-                >
-                  Close
-                </button>
-              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-pink-600 rounded-md shadow-sm hover:bg-pink-700 sm:w-auto sm:text-sm"
+                onClick={() => {
+                  setDeleteModal(false);
+                  router.push("/user/playlists");
+                }}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {nameModal && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div
-              className="fixed inset-0 transition-opacity"
-              aria-hidden="true"
-            >
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
+        <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
 
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full sm:max-w-md">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <div
-                      className="text-lg leading-6 font-medium text-gray-900"
-                      id="modal-title"
-                    >
-                      <input
-                        type="text"
-                        className="mt-4 p-2 border border-gray-300 rounded-md w-full"
-                        placeholder="Playlist Name..."
-                        value={newName}
-                        onChange={(e) => setNewName(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg mb-28 sm:p-8">
+            <div className="text-center">
+              <div className="mt-4">
+                <label>
+                  <input
+                    type="text"
+                    className="mt-4 p-2 border border-gray-300 rounded-md w-full"
+                    placeholder={originalName}
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    aria-label="New Playlist Name Input"
+                  />
+                </label>
               </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-600 text-base font-medium text-white hover:bg-pink-700 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={closeModal}
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-600 text-base font-medium text-white hover:bg-pink-700 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={handleUpdateName}
-                >
-                  Update Name
-                </button>
-              </div>
+            </div>
+            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <button
+                type="button"
+                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-700 text-base font-medium text-white hover:bg-pink-800 sm:ml-3 sm:w-auto sm:text-sm"
+                onClick={() => {
+                  closeModal();
+                  setNewName(null);
+                }}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-pink-700 text-base font-medium text-white hover:bg-pink-800 sm:ml-3 sm:w-auto sm:text-sm"
+                onClick={handleUpdateName}
+              >
+                Update Name
+              </button>
             </div>
           </div>
         </div>

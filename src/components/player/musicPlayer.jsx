@@ -10,6 +10,7 @@ function MusicPlayer() {
   const [user, loading] = useAuthState(auth);
   const [token, setToken] = useState(null);
   const [deviceId, setDeviceId] = useContext(PlayerContext);
+  const [currentTrack, setCurrentTrack] = useState(null);
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -31,8 +32,6 @@ function MusicPlayer() {
       tok = res.data.token;
       setToken(tok);
     };
-
-    fetchToken();
   }, [user, loading]);
 
   const refetchToken = async () => {
@@ -53,6 +52,26 @@ function MusicPlayer() {
     return tok;
   };
 
+  const addTrackToDatabase = async (trackId) => {
+    let res, tok;
+    tok = await user.getIdToken();
+    try {
+      res = await axios.post(
+        "/api/tracks/user/add",
+        {
+          trackId: trackId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tok}`,
+          },
+        }
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     user && (
       <div className="fixed bottom-0 z-40 w-full">
@@ -63,8 +82,16 @@ function MusicPlayer() {
           play={false}
           callback={async (state) => {
             // Set the device id in storage
-            if (state.deviceId) {
+            if (state.deviceId !== deviceId) {
               setDeviceId(state.deviceId);
+            }
+            // Check if the player has changed the track and is playing.
+            if (state.track.uri !== currentTrack && state.isPlaying) {
+              // Set the current track
+              setCurrentTrack(state.track.uri);
+              let trackId = state.track.uri.split(":")[2];
+              // Add the track as being played by the user in the database.
+              addTrackToDatabase(trackId);
             }
           }}
           styles={{
@@ -79,8 +106,10 @@ function MusicPlayer() {
           hideAttribution={true}
           layout="responsive"
           magnifySliderOnHover={true}
-          getOAuthToken={(cb) => {
-            cb(refetchToken());
+          getOAuthToken={async (cb) => {
+            // fetch token from backend api
+            let tok = await refetchToken();
+            cb(tok);
           }}
         ></SpotifyPlayer>
       </div>

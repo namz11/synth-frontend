@@ -13,6 +13,7 @@ import {
   onAuthStateChanged,
   sendEmailVerification,
   signOut,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import Image from "next/image";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -114,19 +115,63 @@ function LogIn() {
   const [verificationModal, setVerificationModal] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [loginModal, setLoginModal] = useState(false);
+  const [forgotPasswordError, setForgotPasswordError] = useState(false);
+  const [forgotPasswordModal, setForgotPasswordModal] = useState(false);
 
   const resendVerificationEmail = async () => {
     try {
       const userCredential = await signIn(auth, email, password);
       const user = userCredential.user;
-
       if (!user.emailVerified) {
         await sendEmailVerification(user);
-        setError("Verification email resent. Please check your inbox.");
       }
     } catch (error) {
-      const errorMessage = error.message;
-      console.log(errorMessage);
+      const errorMessage = error.code;
+      switch (errorMessage) {
+        case "auth/too-many-requests":
+          setVerificationError(
+            "Check your inbox and spam folder again. If you can't find the confirmation email, try the login button again shortly!"
+          );
+          break;
+        case "auth/network-request-failed":
+          setVerificationError(
+            "A network error has occurred. Please check your connection and try again."
+          );
+          break;
+        default:
+          setVerificationError(
+            "An unknown error occurred while sending the verification email."
+          );
+      }
+      setVerificationModal(true);
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      setForgotPasswordError("Please enter an email address.");
+      setForgotPasswordModal(true);
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setForgotPasswordError(
+        "If your email is registered with us, you'll receive a password reset email shortly. Please check your inbox or spam in case you didn't already receive it."
+      );
+      setForgotPasswordModal(true);
+    } catch (error) {
+      console.error("Error sending password reset email: ", error);
+      if (error.code === "auth/user-not-found") {
+        console.error("Error sending password reset email: ", error);
+        setForgotPasswordError("The email address does not exist.");
+        setForgotPasswordModal(true);
+      } else {
+        setForgotPasswordError(
+          "If your email is registered with us, you'll receive a password reset email shortly. Please check your inbox or spam in case you didn't already receive it."
+        );
+        setForgotPasswordModal(true);
+      }
     }
   };
 
@@ -136,9 +181,6 @@ function LogIn() {
     try {
       const userCredential = await signIn(auth, email, password);
       const user = userCredential.user;
-      {
-        console.log(`EMAIL VERIFIED? ${user.emailVerified}`);
-      }
       if (user.emailVerified === true) {
         setVerificationError(false);
         dispatch({ type: "LOGIN", payload: user });
@@ -162,9 +204,7 @@ function LogIn() {
           );
           break;
         case "auth/user-not-found":
-          setLoginError(
-            "No account found for this email. Please check the email or create a new account."
-          );
+          setLoginError("Incorrect email or password. Please try again.");
 
           break;
         case "auth/wrong-password":
@@ -172,7 +212,7 @@ function LogIn() {
           break;
         case "auth/too-many-requests":
           setLoginError(
-            "Too many attempts. Please wait a few minutes before trying again."
+            "Check your inbox and spam folder again. If you can't find the confirmation email, try the login button again shortly!"
           );
 
           break;
@@ -187,9 +227,9 @@ function LogIn() {
 
   return (
     <>
-      <div className="mt-4">
-        <section className="bg-white">
-          <div className="lg:grid lg:min-h-[93vh] lg:grid-cols-12">
+      <div>
+        <section className="bg-slate-900">
+          <div className="lg:grid lg:min-h-[101vh] lg:grid-cols-12">
             <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
               <Image
                 alt="Pattern"
@@ -206,17 +246,16 @@ function LogIn() {
             >
               <div className="max-w-xl lg:max-w-3xl">
                 <Link href="/" passHref>
-                  <span className="sr-only">Login Page</span>
-                  <span className="self-center text-xl font-semibold whitespace-nowrap">
+                  <span className="self-center text-xl font-semibold whitespace-nowrap text-white">
                     Synth
                   </span>
                 </Link>
 
-                <h1 className="mt-6 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+                <h1 className="mt-6 text-2xl font-bold text-white sm:text-3xl md:text-4xl">
                   Welcome back to Synth 🎵
                 </h1>
 
-                <p className="mt-4 leading-relaxed text-gray-500">
+                <p className="mt-4 leading-relaxed text-blue-300">
                   Access your Synth account to continue your listening journey.{" "}
                   <br />
                   Login with your credentials and start exploring today!
@@ -230,7 +269,7 @@ function LogIn() {
                   <div className="col-span-6">
                     <label
                       htmlFor="Email"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-cyan-200"
                     >
                       Email
                     </label>
@@ -250,7 +289,7 @@ function LogIn() {
                   <div className="col-span-6 sm:col-span-3">
                     <label
                       htmlFor="Password"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-cyan-200"
                     >
                       Password
                     </label>
@@ -267,14 +306,26 @@ function LogIn() {
                     />
                   </div>
 
-                  <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                    <button className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-20 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500">
-                      Log In
-                    </button>
+                  <div className="col-span-6 sm:grid sm:items-center sm:gap-4">
+                    <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
+                      <button className="inline-block shrink-0 rounded-md border border-pink-600 bg-pink-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-pink-300 focus:outline-none focus:ring active:text-pink-400">
+                        Log In
+                      </button>
+                      <button
+                        onClick={handleForgotPassword}
+                        className="text-sm text-pink-500 hover:text-indigo-100 cursor-pointer mt-2 sm:mt-0 ml-2"
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
 
-                    <p className="mt-4 text-sm text-gray-500 sm:mt-0">
+                    <p className="mt-4 text-sm text-blue-300 sm:mt-4">
                       <span>New to Synth? </span>
-                      <Link href="/auth/signup" passHref>
+                      <Link
+                        className="text-pink-500 hover:text-indigo-100 cursor-pointer"
+                        href="/auth/signup"
+                        passHref
+                      >
                         Sign Up
                       </Link>
                     </p>
@@ -284,7 +335,7 @@ function LogIn() {
                   <div className="col-span-4 sm:col-span-2">
                     <div className="w-auto py-2">
                       <button
-                        className="flex items-center p-4 bg-white hover:bg-gray-50 border rounded-lg transition ease-in-out duration-200 cursor-pointer"
+                        className="flex items-center p-4 bg-white hover:bg-pink-100 rounded-lg transition ease-in-out duration-200 cursor-pointer border-purple-400"
                         onClick={handleGoogleSignIn}
                       >
                         <img
@@ -315,9 +366,14 @@ function LogIn() {
           <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
             <div className="text-center">
               <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900">
+                <h2 className="text-lg font-medium text-gray-900">
                   Email Verification Pending
-                </h3>
+                </h2>
+                {verificationError && (
+                  <div className="text-sm text-gray-700">
+                    {verificationError}
+                  </div>
+                )}
                 <div className="mt-2">
                   <div className="text-sm text-gray-500">
                     We have just sent you an email with a verification link to
@@ -350,7 +406,7 @@ function LogIn() {
           <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
             <div className="text-center">
               <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-900">Oops!</h3>
+                <h2 className="text-lg font-medium text-gray-900">Oops!</h2>
                 <div className="mt-2">
                   <div className="text-sm text-gray-500">{loginError}</div>
                 </div>
@@ -365,6 +421,46 @@ function LogIn() {
                   setLoginModal(false);
                   setLoginError(false);
                 }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {forgotPasswordModal && (
+        <div className="fixed z-10 inset-0 flex items-center justify-center overflow-y-auto">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+
+          <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:p-8">
+            <div className="text-center">
+              <div className="mt-4">
+                {forgotPasswordError ? (
+                  <h2>{forgotPasswordError}</h2>
+                ) : (
+                  <div>
+                    <h2 className="text-lg font-medium text-gray-900">
+                      Forgot Password
+                    </h2>
+                    <div className="mt-2">
+                      <div className="text-sm text-gray-500">
+                        A password reset email has been sent to your email
+                        address. Please check your inbox and follow the
+                        instructions to reset your password.
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <button
+                type="button"
+                className="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-pink-600 rounded-md shadow-sm hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 sm:w-auto sm:text-sm"
+                onClick={() => setForgotPasswordModal(false)}
               >
                 Close
               </button>
