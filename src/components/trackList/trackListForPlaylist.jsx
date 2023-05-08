@@ -7,7 +7,7 @@ import { BsFillPlayFill } from "react-icons/bs";
 import { spotifyApi } from "react-spotify-web-playback";
 import { PlayerContext } from "@context/PlayerContext";
 
-function TopTrackForPlaylist({ tracks, token }) {
+function TrackForPlaylist({ tracks, token }) {
   const [showModal, setShowModal] = useState(false);
   const [selectedTrackId, setSelectedTrackId] = useState(null);
   const [userPlaylists, setUserPlaylists] = useState(null);
@@ -101,7 +101,7 @@ function TopTrackForPlaylist({ tracks, token }) {
         {tracks.map((track, index) => {
           return (
             <div
-              key={track.id}
+              key={index + 1}
               className="flex items-center rounded-md px-4 py-4 hover:bg-gray-800 cursor-pointer"
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(-1)}
@@ -291,4 +291,4 @@ function TopTrackForPlaylist({ tracks, token }) {
   );
 }
 
-export default TopTrackForPlaylist;
+export default TrackForPlaylist;

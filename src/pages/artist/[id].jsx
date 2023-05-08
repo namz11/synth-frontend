@@ -8,6 +8,7 @@ import ArtistComponent from "@components/artist/artist";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@utils/firebase";
 import Loader from "@components/loader/loader";
+import Error404 from "@components/error/error404";
 
 const Artist = () => {
   const router = useRouter();
@@ -18,6 +19,7 @@ const Artist = () => {
   const [artistData, setArtistData] = useState(null);
   const [artistTopTracksData, setArtistTopTracksData] = useState(null);
   const [token, setToken] = useState(null);
+  const [error404, setError404] = useState(false);
 
   const [loader, setLoading] = useState(true);
   useEffect(() => {
@@ -29,24 +31,31 @@ const Artist = () => {
     };
 
     async function fetchArtistData(theToken) {
-      if (id) {
-        const { data } = await axios(`/api/artist/${id}`, {
-          headers: {
-            Authorization: `Bearer ${theToken}`,
-          },
-        });
-        setArtistData(data);
-      }
-    }
-    async function fetchArtistTopTracksData(theToken) {
-      if (id) {
-        const { data } = await axios(`/api/artist/${id}/top-tracks`, {
-          headers: {
-            Authorization: `Bearer ${theToken}`,
-          },
-        });
-        setArtistTopTracksData(data);
-        setToken(theToken);
+      try {
+        if (id && /^[0-9a-zA-Z]+$/.test(id.trim()) && id.trim().length === 22) {
+          const { data } = await axios(`/api/artist/${id}`, {
+            headers: {
+              Authorization: `Bearer ${theToken}`,
+            },
+          });
+          setArtistData(data);
+
+          if (id) {
+            const { data } = await axios(`/api/artist/${id}/top-tracks`, {
+              headers: {
+                Authorization: `Bearer ${theToken}`,
+              },
+            });
+            setArtistTopTracksData(data);
+            setToken(theToken);
+            setLoading(false);
+          }
+        } else {
+          setError404(true);
+          setLoading(false);
+        }
+      } catch (error) {
+        setError404(true);
         setLoading(false);
       }
     }
@@ -56,13 +65,23 @@ const Artist = () => {
         const promises = [logToken()];
         Promise.all(promises).then(([theToken]) => {
           fetchArtistData(theToken);
-          fetchArtistTopTracksData(theToken);
         });
       } else {
         console.log("Denied due to unauthorized");
       }
     }
   }, [id, user, loading]);
+
+  if (error404) {
+    return (
+      <>
+        <MainLayout>
+          {/* <div className="text-white text-4xl">Error 404</div> */}
+          <Error404 />
+        </MainLayout>
+      </>
+    );
+  }
 
   if (loader) {
     return (
