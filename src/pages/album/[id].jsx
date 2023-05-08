@@ -8,6 +8,7 @@ import AlbumComponent from "@components/album/album";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@utils/firebase";
 import Loader from "@components/loader/loader";
+import Error404 from "@components/error/error404";
 
 const Album = () => {
   const router = useRouter();
@@ -18,6 +19,7 @@ const Album = () => {
   const [albumData, setAlbumData] = useState(null);
   const [loader, setLoading] = useState(true);
   const [token, setToken] = useState(null);
+  const [error404, setError404] = useState(false);
 
   useEffect(() => {
     const logToken = async () => {
@@ -28,14 +30,22 @@ const Album = () => {
     };
 
     async function fetchAlbumData(theToken) {
-      if (id) {
-        const { data } = await axios(`/api/album/${id}`, {
-          headers: {
-            Authorization: `Bearer ${theToken}`,
-          },
-        });
-        setAlbumData(data);
-        setToken(theToken);
+      try {
+        if (id && /^[0-9a-zA-Z]+$/.test(id.trim()) && id.trim().length === 22) {
+          const { data } = await axios(`/api/album/${id}`, {
+            headers: {
+              Authorization: `Bearer ${theToken}`,
+            },
+          });
+          setAlbumData(data);
+          setToken(theToken);
+          setLoading(false);
+        } else {
+          setError404(true);
+          setLoading(false);
+        }
+      } catch (error) {
+        setError404(true);
         setLoading(false);
       }
     }
@@ -43,17 +53,24 @@ const Album = () => {
     if (!loading) {
       if (user) {
         const promises = [logToken()];
-        // #FIREBASEAUTH Promise.all is used to execute both promises concurrently and wait until they are both resolved.
         Promise.all(promises).then(([theToken]) => {
-          // #FIREBASEAUTH Once the promises are resolved, the fetchFeaturedPlaylists function and the fetchCategoryPlaylists function is called with resolved token as a parameter.
           fetchAlbumData(theToken);
         });
       } else {
-        // FIREBASEAUTH If user is falsy, the code logs a message "Denied due to unauthorized".
         console.log("Denied due to unauthorized");
       }
     }
   }, [id, user, loading]);
+
+  if (error404) {
+    return (
+      <>
+        <MainLayout>
+          <Error404 />
+        </MainLayout>
+      </>
+    );
+  }
 
   if (loader) {
     return (

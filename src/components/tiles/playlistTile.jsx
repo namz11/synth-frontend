@@ -80,7 +80,8 @@ const PlaylistTile = ({ data }) => {
               <span className="block text-sm text-gray-700 dark:text-gray-200 truncate">
                 {isUserPlaylist
                   ? `${data?.tracks?.length} songs`
-                  : data?.description || data?.owner?.display_name}
+                  : data?.description.replace(/<\/?[^>]+(>|$)/g, "") ||
+                    data?.owner?.display_name}
               </span>
             </div>
           </div>

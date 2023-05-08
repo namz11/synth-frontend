@@ -7,6 +7,7 @@ import { PlaylistContext } from "@context/PlaylistContext";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@utils/firebase";
 import Loader from "@components/loader/loader";
+import Error404 from "@components/error/error404";
 
 function UserPlaylist() {
   const router = useRouter();
@@ -17,6 +18,8 @@ function UserPlaylist() {
   const [loader, setLoading] = useState(true);
   const [token, setToken] = useState(null);
   const [error, setError] = useState(false);
+  const [error404, setError404] = useState(false);
+
   const {
     setFullPlaylistData,
     setFullTracksData,
@@ -33,34 +36,47 @@ function UserPlaylist() {
     };
 
     async function fetchPlaylistData(theToken) {
-      if (id) {
-        const { data } = await axios(`/api/user/playlists/${id}`, {
-          headers: {
-            Authorization: `Bearer ${theToken}`,
-          },
-        });
+      try {
+        if (
+          id &&
+          /^[0-9a-zA-Z-]+$/.test(id.trim()) &&
+          id.trim().length === 20
+        ) {
+          const { data } = await axios(`/api/user/playlists/${id}`, {
+            headers: {
+              Authorization: `Bearer ${theToken}`,
+            },
+          });
 
-        if (user.uid !== data.data.userId) {
-          setError(true);
-        } else {
-          setFullPlaylistData(data);
+          if (user.uid !== data.data.userId) {
+            setError(true);
+          } else {
+            setFullPlaylistData(data);
 
-          if (data) {
-            const trackDataArray = await Promise.all(
-              data.data.tracks.map(async (trackId) => {
-                const response = await axios(`/api/tracks/${trackId}`, {
-                  headers: {
-                    Authorization: `Bearer ${theToken}`,
-                  },
-                });
-                return response.data.data;
-              })
-            );
-            setFullTracksData(trackDataArray);
+            if (data) {
+              const trackDataArray = await Promise.all(
+                data.data.tracks.map(async (trackId) => {
+                  const response = await axios(`/api/tracks/${trackId}`, {
+                    headers: {
+                      Authorization: `Bearer ${theToken}`,
+                    },
+                  });
+                  return response.data.data;
+                })
+              );
+              setFullTracksData(trackDataArray);
+            }
+            setToken(theToken);
+            setLoading(false);
           }
-          setToken(theToken);
+        } else {
+          console.log("Ahiya j chu");
+          setError404(true);
           setLoading(false);
         }
+      } catch (error) {
+        setError404(true);
+        setLoading(false);
       }
     }
 
@@ -75,6 +91,16 @@ function UserPlaylist() {
       }
     }
   }, [id, user, loading, setFullPlaylistData, setFullTracksData]);
+
+  if (error404) {
+    return (
+      <>
+        <MainLayout>
+          <Error404 />
+        </MainLayout>
+      </>
+    );
+  }
 
   if (error) {
     return (
