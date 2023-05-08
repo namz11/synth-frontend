@@ -8,7 +8,7 @@ import axios from "axios";
 // #FIREBASEAUTH For authentication and authorisation
 import { AuthContext } from "@context/AuthContext";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, signIn } from "@utils/firebase";
+import { auth } from "@utils/firebase";
 import Loader from "@components/loader/loader";
 
 const Playlist = () => {

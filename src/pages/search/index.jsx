@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import MainLayout from "@components/layouts/main-layout";
 import { useRouter } from "next/router";
 import Scroller from "@components/scroller/scroller";
@@ -19,35 +19,35 @@ const Search = () => {
   const [playlists, setPlaylists] = useState(null);
   const [token, setToken] = useState(null);
 
-  const logToken = async () => {
-    if (user) {
-      const token = await user.getIdToken();
-      setToken(token);
-      return token;
-    }
-  };
-
-  const fetchData = async () => {
-    try {
-      const token = await logToken();
-      const response = await axios.get(`/api/search?search=${searchTerm}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setTracks(response.data.tracks.tracks.items);
-      setArtists(response.data.artists.artists.items);
-      setAlbums(response.data.albums.albums.items);
-      setPlaylists(response.data.playlists.playlists.items);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
   useEffect(() => {
+    const logToken = async () => {
+      if (user) {
+        const token = await user.getIdToken();
+        setToken(token);
+        return token;
+      }
+    };
+
+    const fetchData = async () => {
+      try {
+        const token = await logToken();
+        const response = await axios.get(`/api/search?search=${searchTerm}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setTracks(response.data.tracks.tracks.items);
+        setArtists(response.data.artists.artists.items);
+        setAlbums(response.data.albums.albums.items);
+        setPlaylists(response.data.playlists.playlists.items);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
     if (searchTerm && user && !loading) {
       fetchData();
     }
-  }, [searchTerm, user]);
+  }, [loading, searchTerm, user]);
 
   return (
     <>

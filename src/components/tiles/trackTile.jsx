@@ -1,5 +1,4 @@
-import React, { useState, useContext } from "react";
-import Link from "next/link";
+import React, { useContext } from "react";
 import { toString } from "lodash-es";
 import { FaPlay } from "react-icons/fa";
 import { spotifyApi } from "react-spotify-web-playback";

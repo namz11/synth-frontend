@@ -5,10 +5,8 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithPopup,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-// import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {

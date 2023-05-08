@@ -1,4 +1,3 @@
-import MainLayout from "@components/layouts/main-layout";
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -6,22 +5,13 @@ import { auth, signUp } from "@utils/firebase";
 import { AuthContext } from "@context/AuthContext";
 import Image from "next/image";
 import { useAuthState } from "react-firebase-hooks/auth";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  collection,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 const db = getFirestore();
 import {
   updateProfile,
   sendEmailVerification,
-  getAuth,
   signInWithPopup,
   GoogleAuthProvider,
-  onAuthStateChanged,
   signOut,
 } from "firebase/auth";
 import {
@@ -40,7 +30,6 @@ import {
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// TODO: Incomplete Functionalities and Validation
 
 function SignUp() {
   const router = useRouter();

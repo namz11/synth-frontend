@@ -114,7 +114,7 @@ const Profile = () => {
         URL.revokeObjectURL(photoFile);
       }
     };
-  }, [photoFile, photoChanged]);
+  }, [photoFile, photoChanged, photo]);
 
   const handleEditClick = () => {
     setEditing(true);
@@ -217,8 +217,8 @@ const Profile = () => {
 
   return (
     <>
-      <MainLayout>
-        <div className="min-w-screen min-h-screen bg-slate-900 flex items-center justify-center px-5 py-5">
+      <MainLayout allowPlayer={false}>
+        <div className="bg-slate-900 flex items-center justify-center px-5 py-5">
           <div
             className="bg-slate-900 text-white rounded-3xl w-full overflow-hidden"
             style={{ maxWidth: "1000px" }}
