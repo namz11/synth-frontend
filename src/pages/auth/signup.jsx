@@ -30,7 +30,6 @@ import {
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// TODO: Incomplete Functionalities and Validation
 
 function SignUp() {
   const router = useRouter();
