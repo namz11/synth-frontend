@@ -1,4 +1,3 @@
-import MainLayout from "@components/layouts/main-layout";
 import React, { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -7,19 +6,16 @@ import { auth, signIn } from "@utils/firebase";
 import { AuthContext } from "@context/AuthContext";
 // #FIREBASEAUTH getAuth, signInWithPopup, GoogleAuthProvider from firebase/auth
 import {
-  getAuth,
   signInWithPopup,
   GoogleAuthProvider,
   onAuthStateChanged,
   sendEmailVerification,
-  signOut,
   sendPasswordResetEmail,
 } from "firebase/auth";
 import Image from "next/image";
 import { useAuthState } from "react-firebase-hooks/auth";
 import {
   getFirestore,
-  collection,
   doc,
   setDoc,
   getDoc,

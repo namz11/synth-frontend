@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { toString } from "lodash-es";
-
-import { AuthContext } from "@context/AuthContext";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, signIn } from "@utils/firebase";
+import { auth } from "@utils/firebase";
 import axios from "axios";
 
 const PlaylistTile = ({ data }) => {

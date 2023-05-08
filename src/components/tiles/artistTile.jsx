@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import { FaMicrophoneAlt } from "react-icons/fa";
 
 const ArtistTile = ({ data }) => {
   if (data) {

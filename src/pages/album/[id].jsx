@@ -1,13 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import MainLayout from "@components/layouts/main-layout";
 import axios from "axios";
 import AlbumComponent from "@components/album/album";
 
 // #FIREBASEAUTH For authentication and authorisation
-import { AuthContext } from "@context/AuthContext";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, signIn } from "@utils/firebase";
+import { auth } from "@utils/firebase";
 import Loader from "@components/loader/loader";
 
 const Album = () => {

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import MainLayout from "@components/layouts/main-layout";
 import { useRouter } from "next/router";
 import Scroller from "@components/scroller/scroller";

@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 
 import { useAuthState } from "react-firebase-hooks/auth";
