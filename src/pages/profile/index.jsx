@@ -135,16 +135,29 @@ const Profile = () => {
 
   const handleSaveClick = async () => {
     let updatedPhotoURL = photo || user.photoURL || "/user.png";
+    const previousPhotoURL = user.photoURL;
 
-    if (photoChanged) {
-      updatedPhotoURL = await uploadProfileImage(photo, user.uid);
-      await updateProfile(user, { photoURL: updatedPhotoURL });
+    if (photoChanged && photo) {
+      try {
+        const imageTest = validateImageInput(photo);
+        updatedPhotoURL = await uploadProfileImage(photo, user.uid);
+        await updateProfile(user, { photoURL: updatedPhotoURL });
+      } catch (error) {
+        updatedPhotoURL = previousPhotoURL;
+        setImageError(error);
+        await updateDoc(doc(db, "users", user.uid), {
+          displayName,
+          firstName,
+          lastName,
+          photoURL: updatedPhotoURL,
+        });
+        return;
+      }
       setPhoto(updatedPhotoURL);
       setPhotoFile(updatedPhotoURL);
     } else {
-      user.photoURL;
+      updatedPhotoURL = user.photoURL || "/user.png";
     }
-
     try {
       await updateDoc(doc(db, "users", user.uid), {
         displayName,
@@ -152,19 +165,6 @@ const Profile = () => {
         lastName,
         photoURL: updatedPhotoURL,
       });
-
-      // Image Error Management
-      if (photo && photoChanged) {
-        try {
-          const imageTest = validateImageInput(photo);
-        } catch (e) {
-          setImageError(e);
-          return;
-        }
-      }
-      if (imageError !== false) {
-        setImageError(false);
-      }
 
       // Firstname Error Management
       try {
