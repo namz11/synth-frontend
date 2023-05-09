@@ -93,6 +93,7 @@ function PlaylistFromUser({ playlistId, token }) {
           setResultResponse(`Playlist Name Updated to ${newName}`);
           setResultModal(true);
         }
+        setNewName(null);
       })
       .catch((error) => {
         setNameModal(false);
@@ -160,7 +161,7 @@ function PlaylistFromUser({ playlistId, token }) {
               {`playlist`.toUpperCase()}
             </p>
             <p className="text-4xl lg:text-7xl font-bold mb-2">
-              {newName || fullPlaylistData.data.name}
+              {newName || originalName || fullPlaylistData.data.name}
             </p>
             {fullPlaylistData.data.tracks !== [] &&
               fullPlaylistData.data.userId && (
