@@ -117,6 +117,7 @@ const Profile = () => {
   }, [photoFile, photoChanged, photo]);
 
   const handleEditClick = () => {
+    setImageError(false);
     setEditing(true);
   };
 
@@ -208,6 +209,7 @@ const Profile = () => {
   };
 
   const handleCancelClick = () => {
+    setImageError(false);
     setPhotoFile(user.photoURL);
     setEditing(false);
   };
