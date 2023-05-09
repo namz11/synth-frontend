@@ -73,7 +73,7 @@ const Header = () => {
 
   /* taken from - https://merakiui.com/components/navbars */
   const loggedInNav = (
-    <nav className="relative bg-white shadow dark:bg-gray-800">
+    <nav className="relative shadow bg-gray-800 z-40">
       <div className="container px-6 py-3 mx-auto md:flex">
         <div className="flex items-center justify-between">
           <Link href="/">
