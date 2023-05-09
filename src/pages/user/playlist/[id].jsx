@@ -70,7 +70,6 @@ function UserPlaylist() {
             setLoading(false);
           }
         } else {
-          console.log("Ahiya j chu");
           setError404(true);
           setLoading(false);
         }

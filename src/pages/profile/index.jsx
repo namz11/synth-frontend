@@ -117,6 +117,7 @@ const Profile = () => {
   }, [photoFile, photoChanged, photo]);
 
   const handleEditClick = () => {
+    setImageError(false);
     setEditing(true);
   };
 
@@ -135,16 +136,29 @@ const Profile = () => {
 
   const handleSaveClick = async () => {
     let updatedPhotoURL = photo || user.photoURL || "/user.png";
+    const previousPhotoURL = user.photoURL;
 
-    if (photoChanged) {
-      updatedPhotoURL = await uploadProfileImage(photo, user.uid);
-      await updateProfile(user, { photoURL: updatedPhotoURL });
+    if (photoChanged && photo) {
+      try {
+        const imageTest = validateImageInput(photo);
+        updatedPhotoURL = await uploadProfileImage(photo, user.uid);
+        await updateProfile(user, { photoURL: updatedPhotoURL });
+      } catch (error) {
+        updatedPhotoURL = previousPhotoURL;
+        setImageError(error);
+        await updateDoc(doc(db, "users", user.uid), {
+          displayName,
+          firstName,
+          lastName,
+          photoURL: updatedPhotoURL,
+        });
+        return;
+      }
       setPhoto(updatedPhotoURL);
       setPhotoFile(updatedPhotoURL);
     } else {
-      user.photoURL;
+      updatedPhotoURL = user.photoURL || previousPhotoURL || "/user.png";
     }
-
     try {
       await updateDoc(doc(db, "users", user.uid), {
         displayName,
@@ -152,19 +166,6 @@ const Profile = () => {
         lastName,
         photoURL: updatedPhotoURL,
       });
-
-      // Image Error Management
-      if (photo && photoChanged) {
-        try {
-          const imageTest = validateImageInput(photo);
-        } catch (e) {
-          setImageError(e);
-          return;
-        }
-      }
-      if (imageError !== false) {
-        setImageError(false);
-      }
 
       // Firstname Error Management
       try {
@@ -205,6 +206,12 @@ const Profile = () => {
     } catch (error) {
       console.log("Error updating user:", error);
     }
+  };
+
+  const handleCancelClick = () => {
+    setImageError(false);
+    setPhotoFile(user.photoURL);
+    setEditing(false);
   };
 
   if (loading) {
@@ -357,6 +364,12 @@ const Profile = () => {
                       className="w-full bg-pink-600 text-white font-bold py-2 px-4 rounded transition hover:bg-pink-500 focus:outline-none focus:ring mt-6"
                     >
                       Save
+                    </button>
+                    <button
+                      onClick={handleCancelClick}
+                      className="w-full bg-pink-600 text-white font-bold py-2 px-4 rounded transition hover:bg-pink-500 focus:outline-none focus:ring mt-3"
+                    >
+                      Cancel
                     </button>
                   </>
                 ) : (
