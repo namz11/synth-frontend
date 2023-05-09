@@ -156,7 +156,7 @@ const Profile = () => {
       setPhoto(updatedPhotoURL);
       setPhotoFile(updatedPhotoURL);
     } else {
-      updatedPhotoURL = user.photoURL || "/user.png";
+      updatedPhotoURL = user.photoURL || previousPhotoURL || "/user.png";
     }
     try {
       await updateDoc(doc(db, "users", user.uid), {
@@ -205,6 +205,11 @@ const Profile = () => {
     } catch (error) {
       console.log("Error updating user:", error);
     }
+  };
+
+  const handleCancelClick = () => {
+    setPhotoFile(user.photoURL);
+    setEditing(false);
   };
 
   if (loading) {
@@ -357,6 +362,12 @@ const Profile = () => {
                       className="w-full bg-pink-600 text-white font-bold py-2 px-4 rounded transition hover:bg-pink-500 focus:outline-none focus:ring mt-6"
                     >
                       Save
+                    </button>
+                    <button
+                      onClick={handleCancelClick}
+                      className="w-full bg-pink-600 text-white font-bold py-2 px-4 rounded transition hover:bg-pink-500 focus:outline-none focus:ring mt-3"
+                    >
+                      Cancel
                     </button>
                   </>
                 ) : (
