@@ -73,11 +73,11 @@ const Header = () => {
 
   /* taken from - https://merakiui.com/components/navbars */
   const loggedInNav = (
-    <nav className="relative bg-white shadow dark:bg-gray-800">
+    <nav className="relative shadow bg-gray-800 z-40">
       <div className="container px-6 py-3 mx-auto md:flex">
         <div className="flex items-center justify-between">
           <Link href="/">
-            <span className="text-2xl font-bold text-gray-800 transition-colors duration-300 transform dark:text-white lg:text-3xl hover:text-gray-700 dark:hover:text-gray-300">
+            <span className="text-2xl font-bold  transition-colors duration-300 transform text-white lg:text-3xl hover:text-gray-300">
               <img src="/Logo.svg" width={56} height={56} alt="logo" />
             </span>
           </Link>
@@ -87,7 +87,7 @@ const Header = () => {
             <button
               onClick={() => setOpen(!isOpen)}
               type="button"
-              className="text-gray-500 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-400 focus:outline-none focus:text-gray-600 dark:focus:text-gray-400"
+              className="text-gray-200 hover:text-gray-400 focus:outline-none focus:text-gray-400"
               aria-label="toggle menu"
             >
               {!isOpen && (
@@ -135,13 +135,13 @@ const Header = () => {
         <div
           className={`${
             isOpen ? "translate-x-0 opacity-100" : "opacity-0 -translate-x-full"
-          } absolute inset-x-0 z-11 w-full px-6 py-4 transition-all duration-300 ease-in-out bg-white dark:bg-slate-800 md:mt-0 md:p-0 md:top-0 md:relative md:opacity-100 md:translate-x-0 md:flex md:items-center md:justify-between`}
+          } absolute inset-x-0 z-11 w-full px-6 py-4 transition-all duration-300 ease-in-out bg-slate-800 md:mt-0 md:p-0 md:top-0 md:relative md:opacity-100 md:translate-x-0 md:flex md:items-center md:justify-between`}
         >
           <div className="flex flex-col px-2 -mx-4 md:flex-row md:mx-10 md:py-0 items-center">
             <Link href="/home">
               <span
                 href="#"
-                className="px-2.5 py-2 text-gray-700 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-700 md:mx-2"
+                className="px-2.5 py-2 transition-colors duration-300 transform rounded-lg text-gray-200 hover:bg-slate-700 md:mx-2 my-2 md:my-0"
               >
                 Home
               </span>
@@ -149,7 +149,7 @@ const Header = () => {
             <Link href="/user/playlists">
               <span
                 href="#"
-                className="px-2.5 py-2 text-gray-700 transition-colors duration-300 transform rounded-lg dark:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-700 md:mx-2"
+                className="px-2.5 py-2 transition-colors duration-300 transform rounded-lg text-gray-200 hover:bg-slate-700 md:mx-2"
               >
                 My Playlists
               </span>
@@ -178,7 +178,7 @@ const Header = () => {
             <input
               autoFocus={router.pathname === "/search"}
               type="text"
-              className="w-full py-2 pl-10 pr-4 text-gray-700 bg-white border rounded-lg dark:bg-slate-800 dark:text-gray-300 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-opacity-40 focus:ring-blue-300"
+              className="w-full py-2 pl-10 pr-4 border rounded-lg bg-slate-800 text-gray-300 border-slate-600 focus:border-blue-300 focus:outline-none focus:ring focus:ring-opacity-40 focus:ring-blue-300"
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => handleSearchChange(e)}
@@ -189,7 +189,7 @@ const Header = () => {
 
           <div className="flex items-center mt-4 lg:mt-0">
             <button
-              className="hidden mx-4 text-gray-600 transition-colors duration-300 transform lg:block dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400 focus:text-gray-700 dark:focus:text-gray-400 focus:outline-none"
+              className="hidden mx-4 transition-colors duration-300 transform lg:block text-gray-200 hover:text-gray-400 focus:text-gray-400 focus:outline-none"
               aria-label="show notifications"
               onClick={handleLogout}
             >
@@ -215,7 +215,7 @@ const Header = () => {
                   alt="Profile avatar and page button"
                 />
               </div>
-              <span className="lg:hidden px-2 text-gray-700 dark:text-gray-200 hover:bg-slate-100 dark:hover:bg-slate-700 truncate">
+              <span className="lg:hidden px-2 text-gray-200 hover:bg-slate-700 truncate">
                 {name}
               </span>
             </button>
