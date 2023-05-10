@@ -42,11 +42,11 @@ const MyPlaylists = () => {
         setIsOpen(false);
         fetchUserPlaylists(token);
       } else {
-        alert("Unable to create. Try again!");
+        alert(data?.message || "Unable to create. Try again!");
       }
       setIsLoading(false);
     } catch (error) {
-      alert("Unable to create. Try again!");
+      alert(error?.response?.data?.message || "Unable to create. Try again!");
       setIsLoading(false);
     }
   };
